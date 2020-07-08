@@ -1,0 +1,11 @@
+mate
+mate-extra
+arc-gtk-theme
+celluloid
+network-manager-applet
+xdg-user-dirs-gtk
+lightdm
+lightdm-gtk-greeter
+lightdm-gtk-greeter-settings
+gnome-packagekit
+arc-x-icons-theme
