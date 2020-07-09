@@ -409,11 +409,11 @@ then
    printf "###     SigLevel = PackageRequired\n" >> /etc/pacman.d/endeavouros-mirrorlist
    printf "###     Include = /etc/pacman.d/endeavouros-mirrorlist\n" >> /etc/pacman.d/endeavouros-mirrorlist
    printf "######################################################\n\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "## Sweden\n Server = https://ftp.acc.umu.se/mirror/endeavouros/repo/\$repo/x86_64\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf " Server = https://mirror.linux.pizza/endeavouros/repo/\$repo/x86_64\n\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "## Germany\n Server = https://mirror.alpix.eu/endeavouros/repo/\$repo/x86_64\n\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "## Github\n Server = https://github.com/endeavouros-team/mirrors/releases/download/mirror1/\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf " Server = https://raw.githubusercontent.com/endeavouros-team/repo/master/\$repo/x86_64\n" >> /etc/pacman.d/endeavouros-mirrorlist
+#   printf "## Sweden\n Server = https://ftp.acc.umu.se/mirror/endeavouros/repo/\$repo/x86_64\n" >> /etc/pacman.d/endeavouros-mirrorlist
+#   printf " Server = https://mirror.linux.pizza/endeavouros/repo/\$repo/x86_64\n\n" >> /etc/pacman.d/endeavouros-mirrorlist
+#   printf "## Germany\n Server = https://mirror.alpix.eu/endeavouros/repo/\$repo/x86_64\n\n" >> /etc/pacman.d/endeavouros-mirrorlist
+#   printf "## Github\n Server = https://github.com/endeavouros-team/mirrors/releases/download/mirror1/\n" >> /etc/pacman.d/endeavouros-mirrorlist
+   printf " Server = https://raw.githubusercontent.com/endeavouros-arm/repo/master/\$repo/\$arch\n" >> /etc/pacman.d/endeavouros-mirrorlist
 
    printf "\n[endeavouros]\n" >> /etc/pacman.conf
    printf "SigLevel = PackageRequired\n" >> /etc/pacman.conf
@@ -456,18 +456,7 @@ then
 fi # boss fi
 ################# End of finding and installing endeavouros-keyring #########################
 
-
-if [ $arch == "armv7h" ]
-then
-   yaypacmanstr=$(ls | grep -E 'yay.*armv7h.pkg.tar')
-   pacman -U --noconfirm $yaypacmanstr
-fi
-if [ $arch == "aarch64" ]
-then
-   yaypacmanstr=$(ls | grep -E 'yay.*aarch64.pkg.tar')
-   pacman -U --noconfirm $yaypacmanstr
-fi
-
+pacman -Syy    # sync new endeavouros mirrorlist just installed above
 
 ################   Begin user input  #######################
 userinputdone=1
@@ -774,7 +763,7 @@ then
    if [ $dename != "none" ]     
    then
       $dename      # run appropriate function for installing Desktop Environment
-      pacman -U --noconfirm welcome-2.9.2-1-any.pkg.tar.zst
+      pacman -S--noconfirm welcome yay
       pacman -S --noconfirm --needed pahis inxi  eos-log-tool eos-update-notifier downgrade endeavouros-theming
    fi
    devicemodel  # check to see if the device is a Raspberry Pi 4 b, if so enable HDMI audio

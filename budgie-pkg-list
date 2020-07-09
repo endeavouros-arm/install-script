@@ -6,7 +6,6 @@ lightdm-gtk-greeter
 lightdm-gtk-greeter-settings
 network-manager-applet
 gnome-software-packagekit-plugin
-gnome-packagekit
 xdg-user-dirs-gtk
 fwupd
 arc-x-icons-theme
