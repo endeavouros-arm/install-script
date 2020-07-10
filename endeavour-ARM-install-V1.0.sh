@@ -763,7 +763,7 @@ then
    if [ $dename != "none" ]     
    then
       $dename      # run appropriate function for installing Desktop Environment
-      pacman -S--noconfirm welcome yay
+      pacman -S --noconfirm welcome yay
       pacman -S --noconfirm --needed pahis inxi  eos-log-tool eos-update-notifier downgrade endeavouros-theming
    fi
    devicemodel  # check to see if the device is a Raspberry Pi 4 b, if so enable HDMI audio
