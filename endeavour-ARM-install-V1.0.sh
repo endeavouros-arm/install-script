@@ -354,9 +354,9 @@ NC='\033[0m' # No Color
 printf "    LOGFILE\n\n" > /root/enosARM.log
 
 
-arch="$(uname -m)"
-case "$arch" in
-        armv7*) arch=armv7h ;;
+arm-arch="$(uname -m)"
+case "$arm-arch" in
+        armv7*) arm-arch=armv7h ;;
 esac
 
 finished=1
@@ -378,6 +378,7 @@ do
          finished=1 ;;
    esac
 done
+
 if [ "$installtype" == "desktop" ]
 then
     printf "\n${CYAN}A Desktop Operating System with your choice of DE will be installed${NC}\n"
@@ -401,8 +402,6 @@ else
 fi
 ok_nok   # function call
 
-printf "\n repo = $repo     arch = $arch\n"
-read -n 1 z
 
 if [ "$installtype" == "desktop" ]
 then
@@ -411,7 +410,7 @@ then
    printf "\n${CYAN}Find current endeavouros-mirrorlist...${NC}\n\n"
    message="\nFind current endeavouros-mirrorlist "
    sleep 1
-   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arch | grep endeavouros-arm-mirrorlist |sed s'/^.*endeavouros-arm-mirrorlist/endeavouros-arm-mirrorlist/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g |tail -1 > mirrors
+   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arm-arch | grep endeavouros-arm-mirrorlist |sed s'/^.*endeavouros-arm-mirrorlist/endeavouros-arm-mirrorlist/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g |tail -1 > mirrors
 
    file="mirrors"
    read -d $'\x04' currentmirrorlist < "$file"
@@ -419,13 +418,13 @@ then
 
    printf "\n${CYAN}Downloading endeavouros-mirrorlist...${NC}"
    message="\nDownloading endeavouros-mirrorlist "
-   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$arch/$currentmirrorlist 2>> logfile2
-   ok-nok      # function call
+   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$arm-arch/$currentmirrorlist 2>> logfile2
+   ok_nok      # function call
 
    printf "\n${CYAN}Installing endeavouros-arm-mirrorlist...${NC}\n"
    message="\nInstalling endeavouros-arm-mirrorlist "
    pacman -U --noconfirm $currentmirrorlist &>> logfile2
-   ok-nok    # function call
+   ok_nok    # function call
 
    printf "\n[endeavouros-arm]\nSigLevel = PackageRequired\nInclude = /etc/pacman.d/endeavouros-arm-mirrorlist\n\n" >> /etc/pacman.conf
 
@@ -451,9 +450,9 @@ then
 
 #   printf " Server = https://raw.githubusercontent.com/endeavouros-arm/repo/master/\$repo/\$arch\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
 
-#   printf "\n[endeavouros-arm]\n" >> /etc/pacman.conf
-#   printf "SigLevel = PackageRequired\n" >> /etc/pacman.conf
-#   printf "Include = /etc/pacman.d/endeavouros-arm-mirrorlist\n" >> /etc/pacman.conf
+   printf "\n[endeavouros-arm]\n" >> /etc/pacman.conf
+   printf "SigLevel = PackageRequired\n" >> /etc/pacman.conf
+   printf "Include = /etc/pacman.d/endeavouros-arm-mirrorlist\n" >> /etc/pacman.conf
 
    #################### find and install endevouros-keyring  ############################
 
@@ -461,7 +460,7 @@ then
    printf "\n${CYAN}Find current endeavouros-keyring...${NC}\n\n"
    message="\nFind current endeavouros-keyring "
    sleep 1
-   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g | tail -1 > keys 2>> /root/enosARM.log
+   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arm-arch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g | tail -1 > keys 2>> /root/enosARM.log
 
 
    file="keys"
@@ -469,7 +468,7 @@ then
 
 #   if [[ $currentkeyring =~ "sig" ]]    # c#heck if currentkeyring contains sig
 #   then
-#   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.xz.*/pkg.tar.xz/'g |tail -1 > keys 2>> /root/enosARM.log
+#   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arm-arch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.xz.*/pkg.tar.xz/'g |tail -1 > keys 2>> /root/enosARM.log
 #   file="keys"
 #   read -d $'\04' currentkeyring < "$file"
 #   fi
@@ -477,7 +476,7 @@ then
 
    printf "\n${CYAN}Downloading endeavouros-keyring...${NC}"
    message="\nDownloading endeavouros-keyring "
-   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$arch/$currentkeyring 2>> /root/enosARM.log
+   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$arm-arch/$currentkeyring 2>> /root/enosARM.log
    ok_nok		# function call
 
    printf "\n${CYAN}Installing endeavouros-keyring...${NC}\n"
@@ -495,6 +494,7 @@ fi # boss fi
 pacman -Syy    # sync new endeavouros mirrorlist just installed above
 
 pacman -Q | grep mirrorlist
+printf "\n"
 pacman -Q | grep keyring
 read -n 1 z
 
@@ -806,6 +806,10 @@ then
       pacman -S --noconfirm --needed welcome yay endeavouros-theming eos-hooks
       pacman -S --noconfirm --needed pahis inxi  eos-log-tool eos-update-notifier downgrade
    fi
+   
+   read -n 1
+   z
+   
    devicemodel  # check to see if the device is a Raspberry Pi 4 b, if so enable HDMI audio
    if [ $dename == "i3wm" ]
    then 
@@ -888,14 +892,14 @@ fi # boss fi
 # rebranding to EndeavourOS
 sed -i 's/Arch/EndeavourOS/' /etc/issue
 sed -i 's/Arch/EndeavourOS/' /etc/arch-release
-sed -i -e s'|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' -e s'|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|' /etc/lsb-release
-sed -i -e s'|^NAME=.*$|NAME=\"EndeavourOS\"|' -e s'|^PRETTY_NAME=.*$|PRETTY_NAME=\"EndeavourOS\"|' -e s'|^HOME_URL=.*$|HOME_URL=\"https://endeavouros.com\"|' -e s'|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL=\"https://endeavouros.com/wiki/\"|' -e s'|^SUPPORT_URL=.*$|SUPPORT_URL=\"https://forum.endeavouros.com\"|' -e s'|^BUG_REPORT_URL=.*$|BUG_REPORT_URL=\"https://github.com/endeavouros-team\"|' -e s'|^LOGO=.*$|LOGO=endeavouros|' /usr/lib/os-release
-if [ ! -d "/etc/pacman.d/hooks" ]
-then
-   mkdir /etc/pacman.d/hooks  
-fi
-cp lsb-release.hook os-release.hook  /etc/pacman.d/hooks/
-chmod 755 /etc/pacman.d/hooks/lsb-release.hook /etc/pacman.d/hooks/os-release.hook
+# sed -i -e s'|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' -e s'|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|' /etc/lsb-release
+# sed -i -e s'|^NAME=.*$|NAME=\"EndeavourOS\"|' -e s'|^PRETTY_NAME=.*$|PRETTY_NAME=\"EndeavourOS\"|' -e s'|^HOME_URL=.*$|HOME_URL=\"https://endeavouros.com\"|' -e s'|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL=\"https://endeavouros.com/wiki/\"|' -e s'|^SUPPORT_URL=.*$|SUPPORT_URL=\"https://forum.endeavouros.com\"|' -e s'|^BUG_REPORT_URL=.*$|BUG_REPORT_URL=\"https://github.com/endeavouros-team\"|' -e s'|^LOGO=.*$|LOGO=endeavouros|' /usr/lib/os-release
+#if [ ! -d "/etc/pacman.d/hooks" ]
+#then
+#   mkdir /etc/pacman.d/hooks  
+#fi
+#cp lsb-release.hook os-release.hook  /etc/pacman.d/hooks/
+#chmod 755 /etc/pacman.d/hooks/lsb-release.hook /etc/pacman.d/hooks/os-release.hook
 
 rm -rf /root/EndeavourOS-ARM
 
