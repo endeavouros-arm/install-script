@@ -401,7 +401,7 @@ else
 fi
 ok_nok   # function call
 
-printf "\n repo = $repo     arch = $arch
+printf "\n repo = $repo     arch = $arch\n"
 read -n 1 z
 
 if [ "$installtype" == "desktop" ]
