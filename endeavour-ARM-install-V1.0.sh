@@ -234,6 +234,11 @@ function devicemodel {
       pacman -S --noconfirm mali-utgard-meson-libgl-x11
    fi
    
+   devicemodel=$(cat /proc/cpuinfo | grep "ODROID-XU4" | awk '{print $3}')
+   if [[ $devicemodel == "ODROID-XU4" ]]
+   then
+      pacman -S --noconfirm odroid-xu3-libgl-headers odroid-xu3-libgl-x11 xf86-video-armsoc-odroid
+   fi
    
 }   # end of function devicemodel
 
@@ -399,25 +404,54 @@ ok_nok   # function call
 
 if [ "$installtype" == "desktop" ]
 then
-   printf "######################################################\n" > /etc/pacman.d/endeavouros-mirrorlist
-   printf "####                                              ####\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "###        EndeavourOS Repository Mirrorlist       ###\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "####                                              ####\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "######################################################\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "#### Entry in file /etc/pacman.conf:\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "###     [endeavouros]\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "###     SigLevel = PackageRequired\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "###     Include = /etc/pacman.d/endeavouros-mirrorlist\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf "######################################################\n\n" >> /etc/pacman.d/endeavouros-mirrorlist
-#   printf "## Sweden\n Server = https://ftp.acc.umu.se/mirror/endeavouros/repo/\$repo/x86_64\n" >> /etc/pacman.d/endeavouros-mirrorlist
-#   printf " Server = https://mirror.linux.pizza/endeavouros/repo/\$repo/x86_64\n\n" >> /etc/pacman.d/endeavouros-mirrorlist
-#   printf "## Germany\n Server = https://mirror.alpix.eu/endeavouros/repo/\$repo/x86_64\n\n" >> /etc/pacman.d/endeavouros-mirrorlist
-#   printf "## Github\n Server = https://github.com/endeavouros-team/mirrors/releases/download/mirror1/\n" >> /etc/pacman.d/endeavouros-mirrorlist
-   printf " Server = https://raw.githubusercontent.com/endeavouros-arm/repo/master/\$repo/\$arch\n" >> /etc/pacman.d/endeavouros-mirrorlist
 
-   printf "\n[endeavouros]\n" >> /etc/pacman.conf
-   printf "SigLevel = PackageRequired\n" >> /etc/pacman.conf
-   printf "Include = /etc/pacman.d/endeavouros-mirrorlist\n" >> /etc/pacman.conf
+   #################### find and install endevouros-arm-mirrorlist  ############################
+   printf "\n${CYAN}Find current endeavouros-mirrorlist...${NC}\n\n"
+   message="\nFind current endeavouros-mirrorlist "
+   sleep 1
+   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arch | grep endeavouros-arm-mirrorlist |sed s'/^.*endeavouros-arm-mirrorlist/endeavouros-arm-mirrorlist/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g |tail -1 > mirrors
+
+   file="mirrors"
+   read -d $'\x04' currentmirrorlist < "$file"
+
+
+   printf "\n${CYAN}Downloading endeavouros-mirrorlist...${NC}"
+   message="\nDownloading endeavouros-mirrorlist "
+   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$arch/$currentmirrorlist 2>> logfile2
+   ok-nok      # function call
+
+   printf "\n${CYAN}Installing endeavouros-arm-mirrorlist...${NC}\n"
+   message="\nInstalling endeavouros-arm-mirrorlist "
+   pacman -U --noconfirm $currentmirrorlist &>> logfile2
+   ok-nok    # function call
+
+   printf "\n[endeavouros-arm]\nSigLevel = PackageRequired\nInclude = /etc/pacman.d/endeavouros-arm-mirrorlist\n\n" >> /etc/pacman.conf
+
+   # cleanup
+   if [ -a $currentmirrorlist ]
+   then
+      rm -f $currentmirrorlist
+   fi
+
+
+
+
+#   printf "######################################################\n" > /etc/pacman.d/endeavouros-arm-mirrorlist
+#   printf "####                                              ####\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
+#   printf "###        EndeavourOS Repository Mirrorlist       ###\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
+#   printf "####                                              ####\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
+#   printf "######################################################\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
+#   printf "#### Entry in file /etc/pacman.conf:\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
+#   printf "###     [endeavouros-arm]\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
+#   printf "###     SigLevel = PackageRequired\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
+#   printf "###     Include = /etc/pacman.d/endeavouros-arm-mirrorlist\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
+#   printf "######################################################\n\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
+
+#   printf " Server = https://raw.githubusercontent.com/endeavouros-arm/repo/master/\$repo/\$arch\n" >> /etc/pacman.d/endeavouros-arm-mirrorlist
+
+#   printf "\n[endeavouros-arm]\n" >> /etc/pacman.conf
+#   printf "SigLevel = PackageRequired\n" >> /etc/pacman.conf
+#   printf "Include = /etc/pacman.d/endeavouros-arm-mirrorlist\n" >> /etc/pacman.conf
 
    #################### find and install endevouros-keyring  ############################
 
@@ -425,7 +459,7 @@ then
    printf "\n${CYAN}Find current endeavouros-keyring...${NC}\n\n"
    message="\nFind current endeavouros-keyring "
    sleep 1
-   curl https://github.com/endeavouros-team/repo/tree/master/endeavouros/x86_64 |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g | tail -1 > keys 2>> /root/enosARM.log
+   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g | tail -1 > keys 2>> /root/enosARM.log
 
 
    file="keys"
@@ -433,7 +467,7 @@ then
 
    if [[ $currentkeyring =~ "sig" ]]    # c#heck if currentkeyring contains sig
    then
-   curl https://github.com/endeavouros-team/repo/tree/master/endeavouros/x86_64 |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.xz.*/pkg.tar.xz/'g |tail -1 > keys 2>> /root/enosARM.log
+   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.xz.*/pkg.tar.xz/'g |tail -1 > keys 2>> /root/enosARM.log
    file="keys"
    read -d $'\04' currentkeyring < "$file"
    fi
@@ -441,7 +475,7 @@ then
 
    printf "\n${CYAN}Downloading endeavouros-keyring...${NC}"
    message="\nDownloading endeavouros-keyring "
-   wget https://github.com/endeavouros-team/repo/raw/master/endeavouros/x86_64/$currentkeyring 2>> /root/enosARM.log
+   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$arch/$currentkeyring 2>> /root/enosARM.log
    ok_nok		# function call
 
    printf "\n${CYAN}Installing endeavouros-keyring...${NC}\n"
