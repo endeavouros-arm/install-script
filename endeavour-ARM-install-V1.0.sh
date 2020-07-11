@@ -401,6 +401,8 @@ else
 fi
 ok_nok   # function call
 
+printf "\n repo = $repo     arch = $arch
+read -n 1 z
 
 if [ "$installtype" == "desktop" ]
 then
@@ -465,12 +467,12 @@ then
    file="keys"
    read -d $'\04' currentkeyring < "$file"
 
-   if [[ $currentkeyring =~ "sig" ]]    # c#heck if currentkeyring contains sig
-   then
-   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.xz.*/pkg.tar.xz/'g |tail -1 > keys 2>> /root/enosARM.log
-   file="keys"
-   read -d $'\04' currentkeyring < "$file"
-   fi
+#   if [[ $currentkeyring =~ "sig" ]]    # c#heck if currentkeyring contains sig
+#   then
+#   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$arch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.xz.*/pkg.tar.xz/'g |tail -1 > keys 2>> /root/enosARM.log
+#   file="keys"
+#   read -d $'\04' currentkeyring < "$file"
+#   fi
 
 
    printf "\n${CYAN}Downloading endeavouros-keyring...${NC}"
@@ -491,6 +493,10 @@ fi # boss fi
 ################# End of finding and installing endeavouros-keyring #########################
 
 pacman -Syy    # sync new endeavouros mirrorlist just installed above
+
+pacman -Q | grep mirrorlist
+pacman -Q | grep keyring
+read -n 1 z
 
 ################   Begin user input  #######################
 userinputdone=1
