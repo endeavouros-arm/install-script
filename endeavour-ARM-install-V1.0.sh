@@ -773,8 +773,6 @@ then
       pacman -S --noconfirm --needed pahis inxi  eos-log-tool eos-update-notifier downgrade
    fi
    
-   read -n 1 z
-   
    devicemodel  # check to see if the device is a Raspberry Pi 4 b, if so enable HDMI audio
    if [ $dename == "i3wm" ]
    then 
