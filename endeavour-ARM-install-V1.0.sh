@@ -769,7 +769,7 @@ then
    if [ $dename != "none" ]     
    then
       $dename      # run appropriate function for installing Desktop Environment
-      pacman -S --noconfirm --needed welcome yay endeavouros-theming
+      pacman -S --noconfirm --needed welcome yay endeavouros-theming eos-hooks
       pacman -S --noconfirm --needed pahis inxi  eos-log-tool eos-update-notifier downgrade
    fi
    
@@ -855,14 +855,14 @@ fi # boss fi
 # rebranding to EndeavourOS
 sed -i 's/Arch/EndeavourOS/' /etc/issue
 sed -i 's/Arch/EndeavourOS/' /etc/arch-release
- sed -i -e s'|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' -e s'|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|' /etc/lsb-release
- sed -i -e s'|^NAME=.*$|NAME=\"EndeavourOS\"|' -e s'|^PRETTY_NAME=.*$|PRETTY_NAME=\"EndeavourOS\"|' -e s'|^HOME_URL=.*$|HOME_URL=\"https://endeavouros.com\"|' -e s'|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL=\"https://endeavouros.com/wiki/\"|' -e s'|^SUPPORT_URL=.*$|SUPPORT_URL=\"https://forum.endeavouros.com\"|' -e s'|^BUG_REPORT_URL=.*$|BUG_REPORT_URL=\"https://github.com/endeavouros-team\"|' -e s'|^LOGO=.*$|LOGO=endeavouros|' /usr/lib/os-release
-if [ ! -d "/etc/pacman.d/hooks" ]
-then
-   mkdir /etc/pacman.d/hooks  
-fi
-cp lsb-release.hook os-release.hook  /etc/pacman.d/hooks/
-chmod 755 /etc/pacman.d/hooks/lsb-release.hook /etc/pacman.d/hooks/os-release.hook
+# sed -i -e s'|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' -e s'|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|' /etc/lsb-release
+# sed -i -e s'|^NAME=.*$|NAME=\"EndeavourOS\"|' -e s'|^PRETTY_NAME=.*$|PRETTY_NAME=\"EndeavourOS\"|' -e s'|^HOME_URL=.*$|HOME_URL=\"https://endeavouros.com\"|' -e s'|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL=\"https://endeavouros.com/wiki/\"|' -e s'|^SUPPORT_URL=.*$|SUPPORT_URL=\"https://forum.endeavouros.com\"|' -e s'|^BUG_REPORT_URL=.*$|BUG_REPORT_URL=\"https://github.com/endeavouros-team\"|' -e s'|^LOGO=.*$|LOGO=endeavouros|' /usr/lib/os-release
+#if [ ! -d "/etc/pacman.d/hooks" ]
+#then
+#   mkdir /etc/pacman.d/hooks  
+#fi
+#cp lsb-release.hook os-release.hook  /etc/pacman.d/hooks/
+#chmod 755 /etc/pacman.d/hooks/lsb-release.hook /etc/pacman.d/hooks/os-release.hook
 
 rm -rf /root/EndeavourOS-ARM
 
