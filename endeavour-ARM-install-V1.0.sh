@@ -841,6 +841,8 @@ then
    systemctl enable ufw.service 2>/dev/null 
    ok_nok  # function call
    
+   cp smb.conf /etc/samba/
+   
    prompt="\n\n${CYAN}Do you want to partition and format a USB 3 DATA SSD and auto mount it at bootup? [y,n] ${NC}"
    simple_yes_no
    if [ $returnanswer == "y" ]
