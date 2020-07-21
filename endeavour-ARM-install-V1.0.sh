@@ -867,7 +867,7 @@ sed -i 's/Arch/EndeavourOS/' /etc/arch-release
 #cp lsb-release.hook os-release.hook  /etc/pacman.d/hooks/
 #chmod 755 /etc/pacman.d/hooks/lsb-release.hook /etc/pacman.d/hooks/os-release.hook
 
-rm -rf /root/EndeavourOS-ARM
+rm -rf /root/install-script
 
 printf "\n\n${CYAN}Installation is complete!${NC}\n\n"
 if [ "$installtype" == "desktop" ]
