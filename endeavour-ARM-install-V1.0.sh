@@ -754,7 +754,9 @@ fi
 
 printf "\n${CYAN}Creating ll alias...${NC}"
 message="\nCreating ll alias "
-printf "\nalias ll='ls -l --color=auto'\n\n" >> /etc/bash.bashrc
+printf "\nalias ll='ls -l --color=auto'\n" >> /etc/bash.bashrc
+printf "alias la='ls -al --color=auto'\n" >> /etc/bash.bashrc
+printf "alias lb='lsblk -o NAME,FSTYPE,FSSIZE,LABEL,MOUNTPOINT'\n\n" >> /etc/bash.bashrc
 ok_nok  # function call
 
 ##################### desktop setup #############################
