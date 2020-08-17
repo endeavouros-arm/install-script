@@ -728,9 +728,9 @@ message="Delete default username (alarm) and Creating new user "
 userdel -r alarm     #delete the default user from the image
 if [ "$installtype" == "desktop" ]
 then
-   useradd -c $fullname -m -G users -s /bin/bash -u 1000 $username 2>> /root/enosARM.log
+   useradd -c "$fullname" -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
 else
-   useradd -m -G users -s /bin/bash -u 1000 $username 2>> /root/enosARM.log
+   useradd -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
 fi
 printf "\nEnter ${CYAN}USER${NC} password.\n\n"
 finished=1
