@@ -545,7 +545,7 @@ do
       fi
    done
   
-      dename=$(whiptail --title "Timezone Selection" --menu --notags "Choose which Desktop Environment to install" 17 100 9 \
+   dename=$(whiptail --title "Timezone Selection" --menu --notags "Choose which Desktop Environment to install" 17 100 9 \
             "0" "No Desktop Environment" \
             "1" "XFCE4" \
             "2" "Mate" \
@@ -633,7 +633,7 @@ do
       Full Name: $fullname \n \
       Desktop Environment: $dename \n\n \
       Is this information correct?"
-      userinputdone="$?"
+      userinputdone="$?" 16 80
    fi
    if [ "$installtype" == "server" ]
    then
@@ -644,7 +644,7 @@ do
       SSH Port: $sshport \n \
       Static IP: $staticip \n\n \
       Is this information correct?"
-      userinputdone="$?"
+      userinputdone="$?" 16 80
    fi
 
 done
