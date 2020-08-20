@@ -1,5 +1,22 @@
 #!/bin/bash
 
+ZONE_DIR="/usr/share/zoneinfo/"
+declare -a timezone_list
+
+generate_timezone_list() {
+	input=$1
+	if [[ -d $input ]]; then
+		for i in "$input"/*; do
+			generate_timezone_list $i
+		done
+	else
+		timezone=${input/#"$ZONE_DIR/"}
+		timezone_list+=($timezone)
+		timezone_list+=("")
+	fi
+
+}
+
 function status_checker() {
    status_code="$1"
    if [[ "$status_code" -eq 1 ]]; then
@@ -23,33 +40,6 @@ else
 fi
 sleep 1
 }	# end of function ok_nok
-
-function gettzentry {
-# requires that the variable directory be set prior to call
-# after call data needs to be pulled from entry after the call
-if [ "$directory" != "$tzsource" ]
-then
-   printf "\033c"; printf "\n"
-fi
-ls $directory
-finished=1
-while [ $finished -ne 0 ]
-do
-   printf "\nTime Zone entries are case sensitive and must be entered exactly as above\n"
-   printf "Enter your time zone item from the above list: "
-   read entry
-   if [ "$entry" == "" ] ; then entry="emptyentry" ; fi
-   xyz=$(ls $directory | grep -x $entry) 
-   if [ "$entry" == "$xyz" ]
-   then
-      finished=0
-      timezonepath=$directory/$entry
-      printf "\n"
-   else
-      printf "\nYour entry did not match an item in the list. Please try again\n"
-   fi
-done
-}   # end of function gettzentry
 
 
 function simple_yes_no {
@@ -369,7 +359,7 @@ esac
 
 pacman -S --noconfirm --needed libnewt # for whiplash dialog
 
-installtype=$(whiptail --menu "Choose type of install" 10 50 2 "1" "Desktop Environment" "2" "Headless server Environment" 3>&2 2>&1 1>&3)
+installtype=$(whiptail --title "EndeavourOS ARM Setup"  --menu "Choose type of install" 10 50 2 "1" "Desktop Environment" "2" "Headless server Environment" 3>&2 2>&1 1>&3)
 
 
 case $installtype in
@@ -473,37 +463,10 @@ userinputdone=1
 while [ $userinputdone -ne 0 ]
 do 
    printf "\033c"; printf "\n"
-   country=""; zone=""; city=""; city2=""
-   
-   tzsource=/usr/share/zoneinfo
 
-   directory=$tzsource
-   if [ -d $directory ]
-   then
-      gettzentry   # function call
-      country=$entry    
-   fi
-
-   directory=$tzsource/$country
-   if  [ -d $directory ]
-   then   
-      gettzentry   # function call
-      zone=$entry
-   fi
-
-   directory=$tzsource/$country/$zone
-   if [ -d $directory ]
-   then
-      gettzentry   # function call
-      city=$entry
-   fi
-
-   directory=$tzsource/$country/$zone/$city
-   if [ -d $directory ]
-   then
-      gettzentry   # function call
-      city2=$entry
-   fi
+   generate_timezone_list $ZONE_DIR
+   timezone=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Timezone Selection" --menu "Please choose your timezone" 16 100 8 --cancel-button 'Back' "${timezone_list[@]}" 3>&2 2>&1 1>&3)
+   timezonepath="${ZONE_DIR}${timezone}"
     
    ############### end of time zone entry ##################################
 
@@ -511,7 +474,7 @@ do
    description="Enter your desired hostname"
    while [ $finished -ne 0 ]
    do
-	host_name=$(whiptail --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
+	host_name=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Configuration" --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
       if [ "$host_name" == "" ] 
       then
 		description="Host name cannot be blank. Enter your desired hostname"
@@ -524,7 +487,7 @@ do
    description="Enter your desired user name"
    while [ $finished -ne 0 ]
    do 
-	username=$(whiptail --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
+	username=$(whiptail --nocancel --title "EndeavourOS ARM Setup - User Setup" --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
 
       if [ "$username" == "" ]
       then
@@ -540,7 +503,7 @@ do
    description="Enter your full name"
    while [ $finished -ne 0 ]
    do 
-	fullname=$(whiptail --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
+	fullname=$(whiptail --nocancel --title "EndeavourOS ARM Setup - User Setup" --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
 
       if [ "$fullname" == "" ]
       then
@@ -550,7 +513,7 @@ do
       fi
    done
   
-   dename=$(whiptail --title "Timezone Selection" --menu --notags "Choose which Desktop Environment to install" 17 100 9 \
+   dename=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Desktop Selection" --menu --notags "Choose which Desktop Environment to install" 17 100 9 \
             "0" "No Desktop Environment" \
             "1" "XFCE4" \
             "2" "Mate" \
@@ -583,7 +546,7 @@ do
      description="Enter the desired SSH port between 8000 and 48000"
      while [ $finished -ne 0 ]
      do
-      	sshport=$(whiptail --inputbox "$description" 10 60 3>&2 2>&1 1>&3)
+      	sshport=$(whiptail --nocancel  --title "EndeavourOS ARM Setup - Server Configuration"  --inputbox "$description" 10 60 3>&2 2>&1 1>&3)
 
         if [ "$sshport" -eq "$sshport" ] # 2>/dev/null
         then
@@ -608,7 +571,7 @@ do
    description="For the best router compatibility, the last octet should be between 150 and 250\n\nEnter the last octet of the desired static IP address $threetriads"
      while [ $finished -ne 0 ]
      do
-      lasttriad=$(whiptail --title "$title" --inputbox "$description" 12 100 3>&2 2>&1 1>&3)
+      lasttriad=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Server Configuration"  --title "$title" --inputbox "$description" 12 100 3>&2 2>&1 1>&3)
        if [ "$lasttriad" -eq "$lasttriad" ] # 2>/dev/null
        then
           if [ $lasttriad -lt 150 ] || [ $lasttriad -gt 250 ]
@@ -631,8 +594,8 @@ do
 
    if [ "$installtype" == "desktop" ]
    then
-      whiptail --yesno "To review, you entered the following information:\n\n \
-      Time Zone: $country $zone $city $city2 \n \
+      whiptail  --title "EndeavourOS ARM Setup - Review Settings"  --yesno "To review, you entered the following information:\n\n \
+      Time Zone: $timezone \n \
       Host Name: $host_name \n \
       User Name: $username \n \
       Full Name: $fullname \n \
@@ -642,8 +605,8 @@ do
    fi
    if [ "$installtype" == "server" ]
    then
-      whiptail --yesno "To review, you entered the following information:\n\n \
-      Time Zone: $country $zone $city $city2 \n \
+      whiptail --title "EndeavourOS ARM Setup - Review Settings" --yesno "To review, you entered the following information:\n\n \
+      Time Zone: $timezone \n \
       Host Name: $host_name \n \
       User Name: $username \n \
       SSH Port: $sshport \n \
