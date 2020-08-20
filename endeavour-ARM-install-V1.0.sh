@@ -1,5 +1,13 @@
 #!/bin/bash
 
+function status_checker() {
+   status_code="$1"
+   if [[ "$status_code" -eq 1 ]]; then
+      printf "${CYAN}Exiting setup..${NC}\n"
+      exit
+   fi 
+}
+
 function ok_nok {
 # Requires that variable "message" be set
 status=$?
@@ -329,7 +337,7 @@ function i3wm {
 ##### check to see if script was run as root #####
 if [ $(id -u) -ne 0 ]
 then
-   printf "\n\nPLEASE RUN THIS SCRIPT WITH sudo or as root\n\n"
+   whiptail --title "Error - Cannot Continue" --msgbox "Please run this script with sudo or as root" 8 47
    exit
 fi
 
@@ -359,31 +367,22 @@ case "$armarch" in
         armv7*) armarch=armv7h ;;
 esac
 
-finished=1
-message=""
-printf "\n${CYAN}Choose type of install ${NC}\n\n"
-while [ $finished -ne 0 ]
-do
-   printf "1 Desktop Environment\n"
-   printf "2 Headless server Environment\n"
-   printf "\n$message"
-   printf "\nEnter your choice of Environment "
-   read installtype
-   finished=0
-   case $installtype in
+installtype=$(whiptail --menu "Choose type of install" 10 50 2 "1" "Desktop Environment" "2" "Headless server Environment" 3>&2 2>&1 1>&3)
+
+
+case $installtype in
       1) installtype="desktop" ;;
       2) installtype="server" ;;
-      *) printf "${RED}ERROR:${NC} Out of range\n\n" 
-         message="\nEnter a number, either 1 or 2 "
-         finished=1 ;;
-   esac
-done
+esac
+
 
 if [ "$installtype" == "desktop" ]
 then
-    printf "\n${CYAN}A Desktop Operating System with your choice of DE will be installed${NC}\n"
+    whiptail --title "EndeavourOS ARM Setup" --msgbox "A Desktop Operating System with your choice of DE will be installed" 8 75
+    status_checker $?
 else
-    printf "\n${CYAN}A headless server environment will be installed${NC}\n"
+    whiptail --title "EndeavourOS ARM Setup" --msgbox "A headless server environment will be installed" 8 52
+    status_checker $?
 fi
 sleep 4
 
@@ -504,26 +503,27 @@ do
    ############### end of time zone entry ##################################
 
    finished=1
+   description="Enter your desired hostname"
    while [ $finished -ne 0 ]
    do
-      printf "\nEnter your desired hostname: "
-      read host_name
+	host_name=$(whiptail --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
       if [ "$host_name" == "" ] 
       then
-         printf "\nEntry is empty, try again\n"
+		description="Host name cannot be blank. Enter your desired hostname"
       else
           finished=0
       fi  
    done
 
    finished=1
+   description="Enter your desired user name"
    while [ $finished -ne 0 ]
    do 
-      printf "\nEnter your desired user name: "
-      read username
+	username=$(whiptail --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
+
       if [ "$username" == "" ]
       then
-         printf "\nEntry is empty, try again\n"
+         description="Entry is blank. Enter your desired username"
       else     
          finished=0
       fi
@@ -531,53 +531,43 @@ do
    
    if [ "$installtype" == "desktop" ]
    then
-      finished=1
-      while [ $finished -ne 0 ]
-      do 
-         printf "\nEnter your Full Name: "
-         read fullname
-         if [ "$fullname" == "" ]
-         then
-            printf "\nEntry is empty, try again\n"
-         else     
-            finished=0
-         fi
-      done
-  
-   
-      finished=1
-      message=""
-      printf "\nChoose which Desktop Environment to install\n\n"
-      while [ $finished -ne 0 ]
-      do
-         printf "0 No Desktop Environment\n"
-         printf "1 XFCE4\n"
-         printf "2 Mate\n"
-         printf "3 KDE Plasma\n"
-         printf "4 Gnome\n"
-         printf "5 Cinnamon\n"
-         printf "6 Budgie-Desktop\n"
-         printf "7 LXQT\n"
-         printf "8 i3-wm"
-         printf "\n$message"
-         printf "\nEnter your choice of Desktop Environment "
-         read denum
+   finished=1
+   description="Enter your full name"
+   while [ $finished -ne 0 ]
+   do 
+	fullname=$(whiptail --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
+
+      if [ "$fullname" == "" ]
+      then
+         description="Entry is blank. Enter your full name"
+      else     
          finished=0
-         case $denum in
-            0) dename="none" ;;
-            1) dename="xfce4" ;;
-            2) dename="mate" ;;
-            3) dename="kde" ;;
-            4) dename="gnome" ;;
-            5) dename="cinnamon" ;;
-            6) dename="budgie" ;;
-            7) dename="lxqt" ;;
-            8) dename="i3wm" ;;
-            *) printf "${RED}ERROR:${NC} Out of range\n\n" 
-               message="\nEnter a number between 0 and 8 "
-               finished=1 ;;
-         esac
-      done
+      fi
+   done
+  
+      dename=$(whiptail --title "Timezone Selection" --menu --notags "Choose which Desktop Environment to install" 17 100 9 \
+            "0" "No Desktop Environment" \
+            "1" "XFCE4" \
+            "2" "Mate" \
+            "3" "KDE Plasma" \
+            "4" "Gnome" \
+            "5" "Cinnamon" \
+            "6" "Budgie-Desktop" \
+            "7" "LXQT" \
+            "8" "i3-wm" \
+         3>&2 2>&1 1>&3)
+
+      case $denum in
+         0) dename="none" ;;
+         1) dename="xfce4" ;;
+         2) dename="mate" ;;
+         3) dename="kde" ;;
+         4) dename="gnome" ;;
+         5) dename="cinnamon" ;;
+         6) dename="budgie" ;;
+         7) dename="lxqt" ;;
+         8) dename="i3wm" ;;
+      esac
    fi
 
 ############################################################
@@ -585,76 +575,78 @@ do
    if [ "$installtype" == "server" ]
    then
      finished=1
+     description="Enter the desired SSH port between 8000 and 48000"
      while [ $finished -ne 0 ]
      do
-        printf "\nEnter the desired SSH port between 8000 and 48000: "
-        read sshport
+      	sshport=$(whiptail --inputbox "$description" 10 60 3>&2 2>&1 1>&3)
+
         if [ "$sshport" -eq "$sshport" ] # 2>/dev/null
         then
              if [ $sshport -lt 8000 ] || [ $sshport -gt 48000 ]
              then
-                printf "\nYour choice is out of range, try again\n"
+                description="Your choice is out of range, try again.\n\nEnter the desired SSH port between 8000 and 48000"
              else
                 finished=0
              fi
         else
-           printf "\nYour choice is not a number, try again\n"
+          description="Your choice is not a number, try again.\n\nEnter the desired SSH port between 8000 and 48000"
         fi
      done
 
-     ethernetdevice=$(ip r | awk 'NR==1{print $5}')
-     routerip=$(ip r | awk 'NR==1{print $3}')
-     threetriads=$routerip
-     xyz=${threetriads#*.*.*.}
-     threetriads=${threetriads%$xyz}
-     printf "\nSETTING UP THE STATIC IP ADDRESS FOR THE SERVER\n"
-     finished=1
+   ethernetdevice=$(ip r | awk 'NR==1{print $5}')
+   routerip=$(ip r | awk 'NR==1{print $3}')
+   threetriads=$routerip
+   xyz=${threetriads#*.*.*.}
+   threetriads=${threetriads%$xyz}
+   title="SETTING UP THE STATIC IP ADDRESS FOR THE SERVER"
+   finished=1
+   description="For the best router compatibility, the last octet should be between 150 and 250\n\nEnter the last octet of the desired static IP address $threetriads"
      while [ $finished -ne 0 ]
      do
-       printf "\nFor the best router compatibility, the last octet should be between 150 and 250\n"   
-       printf "Enter the last octet of the desired static IP address $threetriads"
-       read lasttriad
+      lasttriad=$(whiptail --title "$title" --inputbox "$description" 12 100 3>&2 2>&1 1>&3)
        if [ "$lasttriad" -eq "$lasttriad" ] # 2>/dev/null
        then
           if [ $lasttriad -lt 150 ] || [ $lasttriad -gt 250 ]
           then
-             printf "\n\nYour choice is out of range. Please try again\n"
+             description="For the best router compatibility, the last octet should be between 150 and 250\n\nEnter the last octet of the desired static IP address $threetriads\n\nYour choice is out of range. Please try again\n"
           else         
             finished=0
           fi
        else
-          printf "\n\nYour choice is not a number.  Please try again\n"
+	   	  description="For the best router compatibility, the last octet should be between 150 and 250\n\nEnter the last octet of the desired static IP address $threetriads\n\nYour choice is not a number.  Please try again\n"
        fi
      done
+
      staticip=$threetriads$lasttriad
      staticipbroadcast+=$staticip"/24"
    fi  # boss fi
    
 #######################################################   
    
-   printf "\033c"; printf "\n"
-   printf "\nTo review, you entered the following information:\n"
-   printf "\nTime Zone = $country $zone $city $city2"
-   printf "\nHost Name = $host_name"
-   printf "\nUser Name = $username"
-   
+
    if [ "$installtype" == "desktop" ]
    then
-     printf "\nFull Name = $fullname"
-     printf "\nDesktop Environment = $dename"
+      whiptail --yesno "To review, you entered the following information:\n\n \
+      Time Zone: $country $zone $city $city2 \n \
+      Host Name: $host_name \n \
+      User Name: $username \n \
+      Full Name: $fullname \n \
+      Desktop Environment: $dename \n\n \
+      Is this information correct?"
+      userinputdone="$?"
    fi
    if [ "$installtype" == "server" ]
    then
-      printf "\nSSH  port = $sshport"
-      printf "\nStatic IP = $staticip"
+      whiptail --yesno "To review, you entered the following information:\n\n \
+      Time Zone: $country $zone $city $city2 \n \
+      Host Name: $host_name \n \
+      User Name: $username \n \
+      SSH Port: $sshport \n \
+      Static IP: $staticip \n\n \
+      Is this information correct?"
+      userinputdone="$?"
    fi
-   
-   prompt="\n\nIs this informatin correct? [y,n,q] "
-   simple_yes_no
-   if [ $returnanswer == "y" ]
-   then
-      userinputdone=0
-   fi
+
 done
 
 ###################   end user input  ######################
