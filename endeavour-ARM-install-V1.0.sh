@@ -367,6 +367,8 @@ case "$armarch" in
         armv7*) armarch=armv7h ;;
 esac
 
+pacman -S --noconfirm --needed libnewt # for whiplash dialog
+
 installtype=$(whiptail --menu "Choose type of install" 10 50 2 "1" "Desktop Environment" "2" "Headless server Environment" 3>&2 2>&1 1>&3)
 
 
