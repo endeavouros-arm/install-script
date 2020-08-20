@@ -557,7 +557,7 @@ do
             "8" "i3-wm" \
          3>&2 2>&1 1>&3)
 
-      case $denum in
+      case $dename in
          0) dename="none" ;;
          1) dename="xfce4" ;;
          2) dename="mate" ;;
@@ -632,8 +632,8 @@ do
       User Name: $username \n \
       Full Name: $fullname \n \
       Desktop Environment: $dename \n\n \
-      Is this information correct?"
-      userinputdone="$?" 16 80
+      Is this information correct?" 16 80
+      userinputdone="$?"
    fi
    if [ "$installtype" == "server" ]
    then
@@ -643,8 +643,8 @@ do
       User Name: $username \n \
       SSH Port: $sshport \n \
       Static IP: $staticip \n\n \
-      Is this information correct?"
-      userinputdone="$?" 16 80
+      Is this information correct?" 16 80
+      userinputdone="$?"
    fi
 
 done
