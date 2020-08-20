@@ -399,7 +399,10 @@ then
    pacman -S --noconfirm --needed - < base-addons
 else
    pacman -S --noconfirm --needed - < server-addons
-   pacman -Rn --noconfirm dhcpcd
+   dhcpcd_installed=$(pacman -Qs dhcpcd)
+    if [[ "$dhcpcd_installed" != "" ]]; then 
+      pacman -Rn --noconfirm dhcpcd
+   fi
 fi
 ok_nok   # function call
 
