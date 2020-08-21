@@ -324,12 +324,6 @@ function i3wm {
 # beginning of script
 #################################################
 
-##### check to see if script was run as root #####
-if [ $(id -u) -ne 0 ]
-then
-   whiptail --title "Error - Cannot Continue" --msgbox "Please run this script with sudo or as root" 8 47
-   exit
-fi
 
 # Declare following global variables
 # uefibootstatus=20
@@ -347,6 +341,35 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
+
+##### check to see if script was run as root #####
+if [ $(id -u) -ne 0 ]
+then
+   whiptail_installed=$(pacman -Qs libnewt)
+   if [[ "$whiptail_installed" != "" ]]; then 
+      whiptail --title "Error - Cannot Continue" --msgbox "Please run this script with sudo or as root" 8 47
+      exit
+   else 
+      printf "${RED}Error - Cannot Continue. Please run this script with sudo or as root.${NC}\n"
+      exit
+   fi
+fi
+
+# Prevent script from continuing if there's any processes running under the alarm user #
+# as we won't be able to delete the user later on in the script #
+
+if [ $(pgrep -u alarm) != "" ]; then
+   whiptail_installed=$(pacman -Qs libnewt)
+   if [[ "$whiptail_installed" != "" ]]; then 
+      whiptail --title "Error - Cannot Continue" --msgbox "alarm user still has processes running. Kill them to continue setup." 8 47
+      exit
+   else 
+      printf "${RED}Error - Cannot Continue. alarm user still has processes running. Kill them to continue setup.${NC}\n"
+      exit
+   fi
+fi
+
+
 
 # create empty /root/enosARM.log
 printf "    LOGFILE\n\n" > /root/enosARM.log
