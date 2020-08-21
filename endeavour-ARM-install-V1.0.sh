@@ -358,7 +358,7 @@ fi
 # Prevent script from continuing if there's any processes running under the alarm user #
 # as we won't be able to delete the user later on in the script #
 
-if [ $(pgrep -u alarm) != "" ]; then
+if [[ $(pgrep -u alarm) != "" ]]; then
    whiptail_installed=$(pacman -Qs libnewt)
    if [[ "$whiptail_installed" != "" ]]; then 
       whiptail --title "Error - Cannot Continue" --msgbox "alarm user still has processes running. Kill them to continue setup." 8 47
