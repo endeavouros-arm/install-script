@@ -114,48 +114,38 @@ do
 done
 }    # end of function yes_no_input
 
-
 function installssd {
-printf "\033c"; printf "\n"
-printf "Connect a USB 3 external enclosure with a SSD or hard drive installed.\n"
-printf "CAUTION: ALL data on this drive will be erased.\n"
-prompt="\n\n${CYAN}Do you want to continue? [y,n]${NC} "
-simple_yes_no
 
-if [ $returnanswer == "y" ]
+base_dialog_content="The following storage devices were found\n\n$(lsblk -o NAME,FSTYPE,FSUSED,FSAVAIL,SIZE,MOUNTPOINT)\n\n \
+Enter target device name (e.g. /dev/sda) or 'abort' to cancel the process:"
+dialog_content="$base_dialog_content"
+
+
+whiptail  --title "EndeavourOS ARM Setup - SSD Configuration"  --yesno "Connect a USB 3 external enclosure with a SSD or hard drive installed\n\n \
+CAUTION: ALL data on this drive will be erased\n\n \
+Do you want to continue?" 12 80 
+user_confirmation="$?"
+
+if [ $user_confirmation == "0" ]
 then
   printf "\nPlease wait for a few seconds.\n"
   sleep 10
-  printf "\n${CYAN}The following storage devices were found on your Computer.${NC}\n\n"
-  lsblk -f
-  printf "\nOne of the devices will be listed as mmcblk0 or mmclbk1 and will have two partitions listed under it.\n"
-  printf "One partition will be / and the other /boot.  That will be the device with the Operating System on it.\n"
-  printf "\nThe other device will probably be listed as sda or something similar and is the target device.\n"
-  printf "\nIf you changed your mind and do not want to partition and format a storage device, enter: abort\n"
-  printf "If the storage device that was plugged in does not show up, enter: repeat\n"
   finished=1
   while [ $finished -ne 0 ]
   do
-     printf "\n${CYAN}Enter target device name prefaced with /dev/ such as /dev/sda with no number at the end${NC} "
-     read datadevicename
+     datadevicename=$(whiptail --title "EndeavourOS ARM Setup - SSD Configuration" --inputbox "$dialog_content" 25 80 3>&2 2>&1 1>&3)
      if [ "$datadevicename" == "abort" ]
      then
         return 
-     fi
-     if [[ ${datadevicename:0:5} != "/dev/" ]] 
-     then
-        if [ "$datadevicename" == "repeat" ]
-        then
-           printf "\n\n"
-        else
-           printf "\n${CYAN}Input improperly formatted.  Try again.${NC}\n\n"
-        fi
-        lsblk -f
+     elif [[ ${datadevicename:0:5} != "/dev/" ]]; then 
+           dialog_content="Input improperly formatted. Try again.\n\n$base_dialog_content"
+     elif [[ ! -b "$datadevicename" ]]; then  
+          dialog_content="Not a block device. Try again.\n\n$base_dialog_content"
      else 
         finished=0
      fi
   done     
-  
+
   ##### Determine data device size in MiB and partition ###
   printf "\n${CYAN}Partitioning, & formatting DATA storage device...${NC}\n"
   datadevicesize=$(fdisk -l | grep "Disk $datadevicename" | awk '{print $5}')
