@@ -332,7 +332,24 @@ RED='\033[0;31m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+
+script_directory="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+if [[ "$script_directory" == "/home/alarm/"* ]]; then
+   whiptail_installed=$(pacman -Qs libnewt)
+   if [[ "$whiptail_installed" != "" ]]; then 
+      whiptail --title "Error - Cannot Continue" --msgbox "This script is in the alarm user's home folder which will be removed.  \
+      \n\nPlease move it to the root user's home directory and rerun the script." 10 80
+      exit
+   else 
+      printf "${RED}Error - Cannot Continue. This script is in the alarm user's home folder which will be removed. Please move it to the root user's home directory and rerun the script.${NC}\n"
+      exit
+   fi
+fi
+
 ##### check to see if script was run as root #####
+
+
 if [ $(id -u) -ne 0 ]
 then
    whiptail_installed=$(pacman -Qs libnewt)
