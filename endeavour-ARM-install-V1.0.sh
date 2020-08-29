@@ -389,6 +389,8 @@ esac
 
 pacman -S --noconfirm --needed libnewt # for whiplash dialog
 
+################   Begin user input  #######################
+
 installtype=$(whiptail --title "EndeavourOS ARM Setup"  --menu "Choose type of install" 10 50 2 "1" "Desktop Environment" "2" "Headless server Environment" 3>&2 2>&1 1>&3)
 
 
@@ -406,89 +408,7 @@ else
     whiptail --title "EndeavourOS ARM Setup" --msgbox "A headless server environment will be installed" 8 52
     status_checker $?
 fi
-sleep 4
 
-pacman -Syy
-
-### the following installs all packages needed to match the EndeavourOS base install
-printf "\n${CYAN}Installing EndeavourOS Base Addons...${NC}\n"
-message="\nInstalling EndeavourOS Base Addons  "
-sleep 2
-if [ "$installtype" == "desktop" ]
-then
-   pacman -S --noconfirm --needed - < base-addons
-else
-   pacman -S --noconfirm --needed - < server-addons
-   dhcpcd_installed=$(pacman -Qs dhcpcd)
-    if [[ "$dhcpcd_installed" != "" ]]; then 
-      pacman -Rn --noconfirm dhcpcd
-   fi
-fi
-ok_nok   # function call
-
-
-if [ "$installtype" == "desktop" ]
-then
-
-   #################### find and install endevouros-arm-mirrorlist  ############################
-   printf "\n${CYAN}Find current endeavouros-mirrorlist...${NC}\n\n"
-   message="\nFind current endeavouros-mirrorlist "
-   sleep 1
-   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$armarch | grep endeavouros-arm-mirrorlist |sed s'/^.*endeavouros-arm-mirrorlist/endeavouros-arm-mirrorlist/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g |tail -1 > mirrors
-
-   file="mirrors"
-   read -d $'\x04' currentmirrorlist < "$file"
-
-
-   printf "\n${CYAN}Downloading endeavouros-mirrorlist...${NC}"
-   message="\nDownloading endeavouros-mirrorlist "
-   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$armarch/$currentmirrorlist 2>> logfile2
-   ok_nok      # function call
-
-   printf "\n${CYAN}Installing endeavouros-arm-mirrorlist...${NC}\n"
-   message="\nInstalling endeavouros-arm-mirrorlist "
-   pacman -U --noconfirm $currentmirrorlist &>> logfile2
-   ok_nok    # function call
-
-   printf "\n[endeavouros-arm]\nSigLevel = PackageRequired\nInclude = /etc/pacman.d/endeavouros-arm-mirrorlist\n\n" >> /etc/pacman.conf
-
-   # cleanup
-   if [ -a $currentmirrorlist ]
-   then
-      rm -f $currentmirrorlist
-   fi
-
-###################################################################################################################
-
-   printf "\n${CYAN}Find current endeavouros-keyring...${NC}\n\n"
-   message="\nFind current endeavouros-keyring "
-   sleep 1
-   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$armarch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g | tail -1 > keys 2>> /root/enosARM.log
-
-   file="keys"
-   read -d $'\04' currentkeyring < "$file"
-
-
-   printf "\n${CYAN}Downloading endeavouros-keyring...${NC}"
-   message="\nDownloading endeavouros-keyring "
-   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$armarch/$currentkeyring 2>> /root/enosARM.log
-   ok_nok		# function call
-
-   printf "\n${CYAN}Installing endeavouros-keyring...${NC}\n"
-   message="Installing endeavouros-keyring "
-   pacman -U --noconfirm $currentkeyring &>> /root/enosARM.log
-   ok_nok		# function call
-   #  cleanup
-   if [ -a $currentkeyring ]
-   then
-      rm -f $currentkeyring
-   fi
-fi # boss fi
-################# End of finding and installing endeavouros-keyring #########################
-
-pacman -Syy    # sync new endeavouros mirrorlist just installed above
-
-################   Begin user input  #######################
 userinputdone=1
 while [ $userinputdone -ne 0 ]
 do 
@@ -650,7 +570,87 @@ done
 ###################   end user input  ######################
 
 
+sleep 4
 
+pacman -Syy
+
+### the following installs all packages needed to match the EndeavourOS base install
+printf "\n${CYAN}Installing EndeavourOS Base Addons...${NC}\n"
+message="\nInstalling EndeavourOS Base Addons  "
+sleep 2
+if [ "$installtype" == "desktop" ]
+then
+   pacman -S --noconfirm --needed - < base-addons
+else
+   pacman -S --noconfirm --needed - < server-addons
+   dhcpcd_installed=$(pacman -Qs dhcpcd)
+    if [[ "$dhcpcd_installed" != "" ]]; then 
+      pacman -Rn --noconfirm dhcpcd
+   fi
+fi
+ok_nok   # function call
+
+
+if [ "$installtype" == "desktop" ]
+then
+
+   #################### find and install endevouros-arm-mirrorlist  ############################
+   printf "\n${CYAN}Find current endeavouros-mirrorlist...${NC}\n\n"
+   message="\nFind current endeavouros-mirrorlist "
+   sleep 1
+   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$armarch | grep endeavouros-arm-mirrorlist |sed s'/^.*endeavouros-arm-mirrorlist/endeavouros-arm-mirrorlist/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g |tail -1 > mirrors
+
+   file="mirrors"
+   read -d $'\x04' currentmirrorlist < "$file"
+
+
+   printf "\n${CYAN}Downloading endeavouros-mirrorlist...${NC}"
+   message="\nDownloading endeavouros-mirrorlist "
+   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$armarch/$currentmirrorlist 2>> logfile2
+   ok_nok      # function call
+
+   printf "\n${CYAN}Installing endeavouros-arm-mirrorlist...${NC}\n"
+   message="\nInstalling endeavouros-arm-mirrorlist "
+   pacman -U --noconfirm $currentmirrorlist &>> logfile2
+   ok_nok    # function call
+
+   printf "\n[endeavouros-arm]\nSigLevel = PackageRequired\nInclude = /etc/pacman.d/endeavouros-arm-mirrorlist\n\n" >> /etc/pacman.conf
+
+   # cleanup
+   if [ -a $currentmirrorlist ]
+   then
+      rm -f $currentmirrorlist
+   fi
+
+###################################################################################################################
+
+   printf "\n${CYAN}Find current endeavouros-keyring...${NC}\n\n"
+   message="\nFind current endeavouros-keyring "
+   sleep 1
+   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$armarch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g | tail -1 > keys 2>> /root/enosARM.log
+
+   file="keys"
+   read -d $'\04' currentkeyring < "$file"
+
+
+   printf "\n${CYAN}Downloading endeavouros-keyring...${NC}"
+   message="\nDownloading endeavouros-keyring "
+   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$armarch/$currentkeyring 2>> /root/enosARM.log
+   ok_nok		# function call
+
+   printf "\n${CYAN}Installing endeavouros-keyring...${NC}\n"
+   message="Installing endeavouros-keyring "
+   pacman -U --noconfirm $currentkeyring &>> /root/enosARM.log
+   ok_nok		# function call
+   #  cleanup
+   if [ -a $currentkeyring ]
+   then
+      rm -f $currentkeyring
+   fi
+fi # boss fi
+################# End of finding and installing endeavouros-keyring #########################
+
+pacman -Syy    # sync new endeavouros mirrorlist just installed above
 
 printf "\n${CYAN}Setting Time Zone...${NC}\n"
 message="\nSetting Time Zone  "
@@ -701,6 +701,7 @@ ok_nok  # function call
 printf "\n${CYAN}Running mkinitcpio...${NC}\n"
 mkinitcpio -P  2>> /root/enosARM.log
 
+#echo "user:pass" | chpasswd
 
 printf "\nEnter your ${CYAN}NEW ROOT${NC} password\n\n"
 finished=1
@@ -790,7 +791,6 @@ then
    printf "\n${CYAN}Creating configuration file for static IP address...${NC}"
    message="\nCreating configuration file for static IP address "
    
-   #ethernetdevice=$(ip r | awk 'NR==1{print $5}')
    if [[ ${ethernetdevice:0:3} == "eth" ]]
    then
       rm /etc/systemd/network/eth*
@@ -850,14 +850,6 @@ fi # boss fi
 # rebranding to EndeavourOS
 sed -i 's/Arch/EndeavourOS/' /etc/issue
 sed -i 's/Arch/EndeavourOS/' /etc/arch-release
-# sed -i -e s'|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' -e s'|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|' /etc/lsb-release
-# sed -i -e s'|^NAME=.*$|NAME=\"EndeavourOS\"|' -e s'|^PRETTY_NAME=.*$|PRETTY_NAME=\"EndeavourOS\"|' -e s'|^HOME_URL=.*$|HOME_URL=\"https://endeavouros.com\"|' -e s'|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL=\"https://endeavouros.com/wiki/\"|' -e s'|^SUPPORT_URL=.*$|SUPPORT_URL=\"https://forum.endeavouros.com\"|' -e s'|^BUG_REPORT_URL=.*$|BUG_REPORT_URL=\"https://github.com/endeavouros-team\"|' -e s'|^LOGO=.*$|LOGO=endeavouros|' /usr/lib/os-release
-#if [ ! -d "/etc/pacman.d/hooks" ]
-#then
-#   mkdir /etc/pacman.d/hooks  
-#fi
-#cp lsb-release.hook os-release.hook  /etc/pacman.d/hooks/
-#chmod 755 /etc/pacman.d/hooks/lsb-release.hook /etc/pacman.d/hooks/os-release.hook
 
 rm -rf /root/install-script
 
