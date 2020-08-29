@@ -599,7 +599,7 @@ do
      done
 
      staticip=$threetriads$lasttriad
-     staticipbroadcast+=$staticip"/24"
+     staticipbroadcast=$staticip"/24"
    fi  # boss fi
    
 #######################################################   
