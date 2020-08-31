@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ZONE_DIR="/usr/share/zoneinfo/"
 declare -a timezone_list
 
@@ -377,7 +376,7 @@ if [[ $(pgrep -u alarm) != "" ]]; then
 fi
 
 
-
+dmesg -n 1 # prevent low level kernel messages from appearing during the script
 # create empty /root/enosARM.log
 printf "    LOGFILE\n\n" > /root/enosARM.log
 
