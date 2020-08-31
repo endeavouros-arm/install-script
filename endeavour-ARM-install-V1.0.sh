@@ -415,7 +415,8 @@ do
    printf "\033c"; printf "\n"
 
    generate_timezone_list $ZONE_DIR
-   timezone=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Timezone Selection" --menu "Please choose your timezone" 16 100 8 --cancel-button 'Back' "${timezone_list[@]}" 3>&2 2>&1 1>&3)
+   timezone=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Timezone Selection" --menu \
+   "Please choose your timezone.\n\nNote: You can navigate to different sections with Page Up/Down or the A-Z keys." 18 90 8 --cancel-button 'Back' "${timezone_list[@]}" 3>&2 2>&1 1>&3)
    timezonepath="${ZONE_DIR}${timezone}"
     
    ############### end of time zone entry ##################################
