@@ -868,7 +868,7 @@ then
    whiptail  --title "EndeavourOS ARM Setup - SSD Configuration"  --yesno "Do you want to partition and format a USB 3 DATA SSD and auto mount it at bootup?" 8 86
    user_confirmation="$?"
 
-   if [ $user_confirmation == "0" ]
+   if [[ $user_confirmation == "0" ]]; then
       installssd
    fi
    
