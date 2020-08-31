@@ -115,9 +115,7 @@ done
 
 function installssd {
 
-base_dialog_content="The following storage devices were found\n\n$(lsblk -o NAME,FSTYPE,FSUSED,FSAVAIL,SIZE,MOUNTPOINT)\n\n \
-Enter target device name (e.g. /dev/sda) or 'abort' to cancel the process:"
-dialog_content="$base_dialog_content"
+
 
 
 whiptail  --title "EndeavourOS ARM Setup - SSD Configuration"  --yesno "Connect a USB 3 external enclosure with a SSD or hard drive installed\n\n \
@@ -130,6 +128,9 @@ then
   printf "\nPlease wait for a few seconds.\n"
   sleep 10
   finished=1
+   base_dialog_content="The following storage devices were found\n\n$(lsblk -o NAME,FSTYPE,FSUSED,FSAVAIL,SIZE,MOUNTPOINT)\n\n \
+   Enter target device name (e.g. /dev/sda) or 'abort' to cancel the process:"
+   dialog_content="$base_dialog_content"
   while [ $finished -ne 0 ]
   do
      datadevicename=$(whiptail --title "EndeavourOS ARM Setup - SSD Configuration" --inputbox "$dialog_content" 25 80 3>&2 2>&1 1>&3)
