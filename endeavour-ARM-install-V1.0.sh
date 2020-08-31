@@ -414,7 +414,8 @@ do
    printf "\033c"; printf "\n"
 
    generate_timezone_list $ZONE_DIR
-   timezone=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Timezone Selection" --menu "Please choose your timezone" 16 100 8 --cancel-button 'Back' "${timezone_list[@]}" 3>&2 2>&1 1>&3)
+   timezone=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Timezone Selection" --menu \
+   "Please choose your timezone.\n\nNote: You can navigate to different sections with Page Up/Down or the A-Z keys." 18 90 8 --cancel-button 'Back' "${timezone_list[@]}" 3>&2 2>&1 1>&3)
    timezonepath="${ZONE_DIR}${timezone}"
     
    ############### end of time zone entry ##################################
@@ -445,7 +446,51 @@ do
          finished=0
       fi
    done
-   
+
+   finished=1
+   initial_user_password=""
+
+   description="Enter your desired password for ${username}:"
+   while [ $finished -ne 0 ]
+   do 
+	user_password=$(whiptail --nocancel --title "EndeavourOS ARM Setup - User Setup" --passwordbox "$description" 8 60 3>&2 2>&1 1>&3)
+
+      if [ "$user_password" == "" ]; then
+         description="Entry is blank. Enter your desired password"
+         initial_user_password=""
+      elif [[ "$initial_user_password" == "" ]]; then 
+            initial_user_password="$user_password"
+            description="Confirm password:"
+      elif [[ "$initial_user_password" != "$user_password" ]]; then
+        description="Passwords do not match.\nEnter your desired password for ${username}:"
+        initial_user_password=""
+      elif [[ "$initial_user_password" == "$user_password" ]]; then     
+         finished=0
+      fi
+   done
+
+   finished=1
+   initial_root_user_password=""
+
+   description="Enter your desired password for the root user:"
+   while [ $finished -ne 0 ]
+   do 
+	root_user_password=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Root User Setup" --passwordbox "$description" 8 60 3>&2 2>&1 1>&3)
+
+      if [ "$root_user_password" == "" ]; then
+         description="Entry is blank. Enter your desired password"
+         initial_root_user_password=""
+      elif [[ "$initial_root_user_password" == "" ]]; then 
+            initial_root_user_password="$root_user_password"
+            description="Confirm password:"
+      elif [[ "$initial_root_user_password" != "$root_user_password" ]]; then
+        description="Passwords do not match.\nEnter your desired password for the root user:"
+        initial_root_user_password=""
+      elif [[ "$initial_root_user_password" == "$root_user_password" ]]; then     
+         finished=0
+      fi
+   done
+
    if [ "$installtype" == "desktop" ]
    then
    finished=1
@@ -700,18 +745,10 @@ ok_nok  # function call
 printf "\n${CYAN}Running mkinitcpio...${NC}\n"
 mkinitcpio -P  2>> /root/enosARM.log
 
-#echo "user:pass" | chpasswd
 
-printf "\nEnter your ${CYAN}NEW ROOT${NC} password\n\n"
-finished=1
-while [ $finished -ne 0 ]
-do
-  if passwd ; then
-      finished=0 ; echo
-   else
-      finished=1 ; printf "\nPassword entry failed, try again\n\n"
-   fi
-done
+printf "\n${CYAN} Updating root user password...\n\n"
+echo "root:${root_user_password}" | chpasswd
+
 
 printf "\n${CYAN}Delete default username (alarm) and Creating a user...${NC}"
 message="Delete default username (alarm) and Creating new user "
@@ -722,17 +759,9 @@ then
 else
    useradd -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
 fi
-printf "\nEnter ${CYAN}USER${NC} password.\n\n"
-finished=1
-while [ $finished -ne 0 ]
-do
-  if passwd $username ; then
-      finished=0 ; echo
-   else
-      finished=1 ; printf "\nPassword entry failed, try again\n\n"
-   fi
-done
-ok_nok 
+printf "\n${CYAN} Updating user password...\n\n"
+echo "${username}:${user_password}" | chpasswd
+
 
 if [ "$installtype" == "desktop" ]
 then
@@ -835,10 +864,10 @@ then
    mkdir -p /etc/samba
    cp smb.conf /etc/samba/
    
-   prompt="\n\n${CYAN}Do you want to partition and format a USB 3 DATA SSD and auto mount it at bootup? [y,n] ${NC}"
-   simple_yes_no
-   if [ $returnanswer == "y" ]
-   then
+   whiptail  --title "EndeavourOS ARM Setup - SSD Configuration"  --yesno "Do you want to partition and format a USB 3 DATA SSD and auto mount it at bootup?" 8 86
+   user_confirmation="$?"
+
+   if [ $user_confirmation == "0" ]
       installssd
    fi
    
