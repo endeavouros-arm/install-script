@@ -864,10 +864,10 @@ then
    mkdir -p /etc/samba
    cp smb.conf /etc/samba/
    
-   prompt="\n\n${CYAN}Do you want to partition and format a USB 3 DATA SSD and auto mount it at bootup? [y,n] ${NC}"
-   simple_yes_no
-   if [ $returnanswer == "y" ]
-   then
+   whiptail  --title "EndeavourOS ARM Setup - SSD Configuration"  --yesno "Do you want to partition and format a USB 3 DATA SSD and auto mount it at bootup?" 8 86
+   user_confirmation="$?"
+
+   if [ $user_confirmation == "0" ]
       installssd
    fi
    
