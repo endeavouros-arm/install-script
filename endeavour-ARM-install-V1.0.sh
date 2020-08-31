@@ -129,15 +129,16 @@ then
   sleep 10
   finished=1
    base_dialog_content="The following storage devices were found\n\n$(lsblk -o NAME,FSTYPE,FSUSED,FSAVAIL,SIZE,MOUNTPOINT)\n\n \
-   Enter target device name (e.g. /dev/sda) or 'abort' to cancel the process:"
+   Enter target device name (e.g. /dev/sda):"
    dialog_content="$base_dialog_content"
   while [ $finished -ne 0 ]
   do
      datadevicename=$(whiptail --title "EndeavourOS ARM Setup - SSD Configuration" --inputbox "$dialog_content" 25 80 3>&2 2>&1 1>&3)
-     if [ "$datadevicename" == "abort" ]
-     then
-        return 
-     elif [[ ${datadevicename:0:5} != "/dev/" ]]; then 
+     exit_status=$?
+     if [ $exit_status == "1" ]; then
+         return
+     fi
+     if [[ ${datadevicename:0:5} != "/dev/" ]]; then 
            dialog_content="Input improperly formatted. Try again.\n\n$base_dialog_content"
      elif [[ ! -b "$datadevicename" ]]; then  
           dialog_content="Not a block device. Try again.\n\n$base_dialog_content"
