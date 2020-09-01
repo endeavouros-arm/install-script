@@ -170,7 +170,7 @@ then
   fi
   printf "\n\nmntname = $mntname\n\n" >> /root/enosARM.log
   printf "\n${CYAN}Formatting DATA device $mntname...${NC}\n"
-  printf "\n${CYAN}If \"/dev/sdx contains a ext4 file system Labelled XXXX\" or similar appears, Enter: yes${NC}\n\n"
+  printf "\n${CYAN}If \"/dev/sdx contains a ext4 file system Labelled XXXX\" or similar appears, Enter: y${NC}\n\n"
   message="\nFormatting DATA device $mntname   "
   mkfs.ext4 $mntname   2>> /root/enosARM.log
   e2label $mntname DATA
@@ -614,9 +614,6 @@ do
 done
 
 ###################   end user input  ######################
-
-
-sleep 4
 
 pacman -Syy
 
