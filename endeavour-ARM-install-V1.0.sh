@@ -1,4 +1,28 @@
 #!/bin/bash
+ZONE_DIR="/usr/share/zoneinfo/"
+declare -a timezone_list
+
+generate_timezone_list() {
+	input=$1
+	if [[ -d $input ]]; then
+		for i in "$input"/*; do
+			generate_timezone_list $i
+		done
+	else
+		timezone=${input/#"$ZONE_DIR/"}
+		timezone_list+=($timezone)
+		timezone_list+=("")
+	fi
+
+}
+
+function status_checker() {
+   status_code="$1"
+   if [[ "$status_code" -eq 1 ]]; then
+      printf "${CYAN}Exiting setup..${NC}\n"
+      exit
+   fi 
+}
 
 function ok_nok {
 # Requires that variable "message" be set
@@ -15,33 +39,6 @@ else
 fi
 sleep 1
 }	# end of function ok_nok
-
-function gettzentry {
-# requires that the variable directory be set prior to call
-# after call data needs to be pulled from entry after the call
-if [ "$directory" != "$tzsource" ]
-then
-   printf "\033c"; printf "\n"
-fi
-ls $directory
-finished=1
-while [ $finished -ne 0 ]
-do
-   printf "\nTime Zone entries are case sensitive and must be entered exactly as above\n"
-   printf "Enter your time zone item from the above list: "
-   read entry
-   if [ "$entry" == "" ] ; then entry="emptyentry" ; fi
-   xyz=$(ls $directory | grep -x $entry) 
-   if [ "$entry" == "$xyz" ]
-   then
-      finished=0
-      timezonepath=$directory/$entry
-      printf "\n"
-   else
-      printf "\nYour entry did not match an item in the list. Please try again\n"
-   fi
-done
-}   # end of function gettzentry
 
 
 function simple_yes_no {
@@ -116,48 +113,40 @@ do
 done
 }    # end of function yes_no_input
 
-
 function installssd {
-printf "\033c"; printf "\n"
-printf "Connect a USB 3 external enclosure with a SSD or hard drive installed.\n"
-printf "CAUTION: ALL data on this drive will be erased.\n"
-prompt="\n\n${CYAN}Do you want to continue? [y,n]${NC} "
-simple_yes_no
 
-if [ $returnanswer == "y" ]
+
+
+
+whiptail  --title "EndeavourOS ARM Setup - SSD Configuration"  --yesno "Connect a USB 3 external enclosure with a SSD or hard drive installed\n\n \
+CAUTION: ALL data on this drive will be erased\n\n \
+Do you want to continue?" 12 80 
+user_confirmation="$?"
+
+if [ $user_confirmation == "0" ]
 then
   printf "\nPlease wait for a few seconds.\n"
   sleep 10
-  printf "\n${CYAN}The following storage devices were found on your Computer.${NC}\n\n"
-  lsblk -f
-  printf "\nOne of the devices will be listed as mmcblk0 or mmclbk1 and will have two partitions listed under it.\n"
-  printf "One partition will be / and the other /boot.  That will be the device with the Operating System on it.\n"
-  printf "\nThe other device will probably be listed as sda or something similar and is the target device.\n"
-  printf "\nIf you changed your mind and do not want to partition and format a storage device, enter: abort\n"
-  printf "If the storage device that was plugged in does not show up, enter: repeat\n"
   finished=1
+   base_dialog_content="The following storage devices were found\n\n$(lsblk -o NAME,FSTYPE,FSUSED,FSAVAIL,SIZE,MOUNTPOINT)\n\n \
+   Enter target device name (e.g. /dev/sda):"
+   dialog_content="$base_dialog_content"
   while [ $finished -ne 0 ]
   do
-     printf "\n${CYAN}Enter target device name prefaced with /dev/ such as /dev/sda with no number at the end${NC} "
-     read datadevicename
-     if [ "$datadevicename" == "abort" ]
-     then
-        return 
+     datadevicename=$(whiptail --title "EndeavourOS ARM Setup - SSD Configuration" --inputbox "$dialog_content" 25 80 3>&2 2>&1 1>&3)
+     exit_status=$?
+     if [ $exit_status == "1" ]; then
+         return
      fi
-     if [[ ${datadevicename:0:5} != "/dev/" ]] 
-     then
-        if [ "$datadevicename" == "repeat" ]
-        then
-           printf "\n\n"
-        else
-           printf "\n${CYAN}Input improperly formatted.  Try again.${NC}\n\n"
-        fi
-        lsblk -f
+     if [[ ${datadevicename:0:5} != "/dev/" ]]; then 
+           dialog_content="Input improperly formatted. Try again.\n\n$base_dialog_content"
+     elif [[ ! -b "$datadevicename" ]]; then  
+          dialog_content="Not a block device. Try again.\n\n$base_dialog_content"
      else 
         finished=0
      fi
   done     
-  
+
   ##### Determine data device size in MiB and partition ###
   printf "\n${CYAN}Partitioning, & formatting DATA storage device...${NC}\n"
   datadevicesize=$(fdisk -l | grep "Disk $datadevicename" | awk '{print $5}')
@@ -181,7 +170,7 @@ then
   fi
   printf "\n\nmntname = $mntname\n\n" >> /root/enosARM.log
   printf "\n${CYAN}Formatting DATA device $mntname...${NC}\n"
-  printf "\n${CYAN}If \"/dev/sdx contains a ext4 file system Labelled XXXX\" or similar appears, Enter: yes${NC}\n\n"
+  printf "\n${CYAN}If \"/dev/sdx contains a ext4 file system Labelled XXXX\" or similar appears, Enter: y${NC}\n\n"
   message="\nFormatting DATA device $mntname   "
   mkfs.ext4 $mntname   2>> /root/enosARM.log
   e2label $mntname DATA
@@ -326,12 +315,6 @@ function i3wm {
 # beginning of script
 #################################################
 
-##### check to see if script was run as root #####
-if [ $(id -u) -ne 0 ]
-then
-   printf "\n\nPLEASE RUN THIS SCRIPT WITH sudo or as root\n\n"
-   exit
-fi
 
 # Declare following global variables
 # uefibootstatus=20
@@ -350,6 +333,52 @@ RED='\033[0;31m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+
+script_directory="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+if [[ "$script_directory" == "/home/alarm/"* ]]; then
+   whiptail_installed=$(pacman -Qs libnewt)
+   if [[ "$whiptail_installed" != "" ]]; then 
+      whiptail --title "Error - Cannot Continue" --msgbox "This script is in the alarm user's home folder which will be removed.  \
+      \n\nPlease move it to the root user's home directory and rerun the script." 10 80
+      exit
+   else 
+      printf "${RED}Error - Cannot Continue. This script is in the alarm user's home folder which will be removed. Please move it to the root user's home directory and rerun the script.${NC}\n"
+      exit
+   fi
+fi
+
+##### check to see if script was run as root #####
+
+
+if [ $(id -u) -ne 0 ]
+then
+   whiptail_installed=$(pacman -Qs libnewt)
+   if [[ "$whiptail_installed" != "" ]]; then 
+      whiptail --title "Error - Cannot Continue" --msgbox "Please run this script with sudo or as root" 8 47
+      exit
+   else 
+      printf "${RED}Error - Cannot Continue. Please run this script with sudo or as root.${NC}\n"
+      exit
+   fi
+fi
+
+# Prevent script from continuing if there's any processes running under the alarm user #
+# as we won't be able to delete the user later on in the script #
+
+if [[ $(pgrep -u alarm) != "" ]]; then
+   whiptail_installed=$(pacman -Qs libnewt)
+   if [[ "$whiptail_installed" != "" ]]; then 
+      whiptail --title "Error - Cannot Continue" --msgbox "alarm user still has processes running. Kill them to continue setup." 8 47
+      exit
+   else 
+      printf "${RED}Error - Cannot Continue. alarm user still has processes running. Kill them to continue setup.${NC}\n"
+      exit
+   fi
+fi
+
+
+dmesg -n 1 # prevent low level kernel messages from appearing during the script
 # create empty /root/enosARM.log
 printf "    LOGFILE\n\n" > /root/enosARM.log
 
@@ -359,33 +388,232 @@ case "$armarch" in
         armv7*) armarch=armv7h ;;
 esac
 
-finished=1
-message=""
-printf "\n${CYAN}Choose type of install ${NC}\n\n"
-while [ $finished -ne 0 ]
-do
-   printf "1 Desktop Environment\n"
-   printf "2 Headless server Environment\n"
-   printf "\n$message"
-   printf "\nEnter your choice of Environment "
-   read installtype
-   finished=0
-   case $installtype in
+pacman -S --noconfirm --needed libnewt # for whiplash dialog
+
+################   Begin user input  #######################
+
+installtype=$(whiptail --title "EndeavourOS ARM Setup"  --menu "Choose type of install" 10 50 2 "1" "Desktop Environment" "2" "Headless server Environment" 3>&2 2>&1 1>&3)
+
+
+case $installtype in
       1) installtype="desktop" ;;
       2) installtype="server" ;;
-      *) printf "${RED}ERROR:${NC} Out of range\n\n" 
-         message="\nEnter a number, either 1 or 2 "
-         finished=1 ;;
-   esac
-done
+esac
+
 
 if [ "$installtype" == "desktop" ]
 then
-    printf "\n${CYAN}A Desktop Operating System with your choice of DE will be installed${NC}\n"
+    whiptail --title "EndeavourOS ARM Setup" --msgbox "A Desktop Operating System with your choice of DE will be installed" 8 75
+    status_checker $?
 else
-    printf "\n${CYAN}A headless server environment will be installed${NC}\n"
+    whiptail --title "EndeavourOS ARM Setup" --msgbox "A headless server environment will be installed" 8 52
+    status_checker $?
 fi
-sleep 4
+
+userinputdone=1
+while [ $userinputdone -ne 0 ]
+do 
+   printf "\033c"; printf "\n"
+
+   generate_timezone_list $ZONE_DIR
+   timezone=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Timezone Selection" --menu \
+   "Please choose your timezone.\n\nNote: You can navigate to different sections with Page Up/Down or the A-Z keys." 18 90 8 --cancel-button 'Back' "${timezone_list[@]}" 3>&2 2>&1 1>&3)
+   timezonepath="${ZONE_DIR}${timezone}"
+    
+   ############### end of time zone entry ##################################
+
+   finished=1
+   description="Enter your desired hostname"
+   while [ $finished -ne 0 ]
+   do
+	host_name=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Configuration" --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
+      if [ "$host_name" == "" ] 
+      then
+		description="Host name cannot be blank. Enter your desired hostname"
+      else
+          finished=0
+      fi  
+   done
+
+   finished=1
+   description="Enter your desired user name"
+   while [ $finished -ne 0 ]
+   do 
+	username=$(whiptail --nocancel --title "EndeavourOS ARM Setup - User Setup" --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
+
+      if [ "$username" == "" ]
+      then
+         description="Entry is blank. Enter your desired username"
+      else     
+         finished=0
+      fi
+   done
+
+   finished=1
+   initial_user_password=""
+
+   description="Enter your desired password for ${username}:"
+   while [ $finished -ne 0 ]
+   do 
+	user_password=$(whiptail --nocancel --title "EndeavourOS ARM Setup - User Setup" --passwordbox "$description" 8 60 3>&2 2>&1 1>&3)
+
+      if [ "$user_password" == "" ]; then
+         description="Entry is blank. Enter your desired password"
+         initial_user_password=""
+      elif [[ "$initial_user_password" == "" ]]; then 
+            initial_user_password="$user_password"
+            description="Confirm password:"
+      elif [[ "$initial_user_password" != "$user_password" ]]; then
+        description="Passwords do not match.\nEnter your desired password for ${username}:"
+        initial_user_password=""
+      elif [[ "$initial_user_password" == "$user_password" ]]; then     
+         finished=0
+      fi
+   done
+
+   finished=1
+   initial_root_user_password=""
+
+   description="Enter your desired password for the root user:"
+   while [ $finished -ne 0 ]
+   do 
+	root_user_password=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Root User Setup" --passwordbox "$description" 8 60 3>&2 2>&1 1>&3)
+
+      if [ "$root_user_password" == "" ]; then
+         description="Entry is blank. Enter your desired password"
+         initial_root_user_password=""
+      elif [[ "$initial_root_user_password" == "" ]]; then 
+            initial_root_user_password="$root_user_password"
+            description="Confirm password:"
+      elif [[ "$initial_root_user_password" != "$root_user_password" ]]; then
+        description="Passwords do not match.\nEnter your desired password for the root user:"
+        initial_root_user_password=""
+      elif [[ "$initial_root_user_password" == "$root_user_password" ]]; then     
+         finished=0
+      fi
+   done
+
+   if [ "$installtype" == "desktop" ]
+   then
+   finished=1
+   description="Enter your full name"
+   while [ $finished -ne 0 ]
+   do 
+	fullname=$(whiptail --nocancel --title "EndeavourOS ARM Setup - User Setup" --inputbox "$description" 8 60 3>&2 2>&1 1>&3)
+
+      if [ "$fullname" == "" ]
+      then
+         description="Entry is blank. Enter your full name"
+      else     
+         finished=0
+      fi
+   done
+  
+   dename=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Desktop Selection" --menu --notags "Choose which Desktop Environment to install" 17 100 9 \
+            "0" "No Desktop Environment" \
+            "1" "XFCE4" \
+            "2" "Mate" \
+            "3" "KDE Plasma" \
+            "4" "Gnome" \
+            "5" "Cinnamon" \
+            "6" "Budgie-Desktop" \
+            "7" "LXQT" \
+            "8" "i3-wm" \
+         3>&2 2>&1 1>&3)
+
+      case $dename in
+         0) dename="none" ;;
+         1) dename="xfce4" ;;
+         2) dename="mate" ;;
+         3) dename="kde" ;;
+         4) dename="gnome" ;;
+         5) dename="cinnamon" ;;
+         6) dename="budgie" ;;
+         7) dename="lxqt" ;;
+         8) dename="i3wm" ;;
+      esac
+   fi
+
+############################################################
+   
+   if [ "$installtype" == "server" ]
+   then
+     finished=1
+     description="Enter the desired SSH port between 8000 and 48000"
+     while [ $finished -ne 0 ]
+     do
+      	sshport=$(whiptail --nocancel  --title "EndeavourOS ARM Setup - Server Configuration"  --inputbox "$description" 10 60 3>&2 2>&1 1>&3)
+
+        if [ "$sshport" -eq "$sshport" ] # 2>/dev/null
+        then
+             if [ $sshport -lt 8000 ] || [ $sshport -gt 48000 ]
+             then
+                description="Your choice is out of range, try again.\n\nEnter the desired SSH port between 8000 and 48000"
+             else
+                finished=0
+             fi
+        else
+          description="Your choice is not a number, try again.\n\nEnter the desired SSH port between 8000 and 48000"
+        fi
+     done
+
+   ethernetdevice=$(ip r | awk 'NR==1{print $5}')
+   routerip=$(ip r | awk 'NR==1{print $3}')
+   threetriads=$routerip
+   xyz=${threetriads#*.*.*.}
+   threetriads=${threetriads%$xyz}
+   title="SETTING UP THE STATIC IP ADDRESS FOR THE SERVER"
+   finished=1
+   description="For the best router compatibility, the last octet should be between 150 and 250\n\nEnter the last octet of the desired static IP address $threetriads"
+     while [ $finished -ne 0 ]
+     do
+      lasttriad=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Server Configuration"  --title "$title" --inputbox "$description" 12 100 3>&2 2>&1 1>&3)
+       if [ "$lasttriad" -eq "$lasttriad" ] # 2>/dev/null
+       then
+          if [ $lasttriad -lt 150 ] || [ $lasttriad -gt 250 ]
+          then
+             description="For the best router compatibility, the last octet should be between 150 and 250\n\nEnter the last octet of the desired static IP address $threetriads\n\nYour choice is out of range. Please try again\n"
+          else         
+            finished=0
+          fi
+       else
+	   	  description="For the best router compatibility, the last octet should be between 150 and 250\n\nEnter the last octet of the desired static IP address $threetriads\n\nYour choice is not a number.  Please try again\n"
+       fi
+     done
+
+     staticip=$threetriads$lasttriad
+     staticipbroadcast=$staticip"/24"
+   fi  # boss fi
+   
+#######################################################   
+   
+
+   if [ "$installtype" == "desktop" ]
+   then
+      whiptail  --title "EndeavourOS ARM Setup - Review Settings"  --yesno "To review, you entered the following information:\n\n \
+      Time Zone: $timezone \n \
+      Host Name: $host_name \n \
+      User Name: $username \n \
+      Full Name: $fullname \n \
+      Desktop Environment: $dename \n\n \
+      Is this information correct?" 16 80
+      userinputdone="$?"
+   fi
+   if [ "$installtype" == "server" ]
+   then
+      whiptail --title "EndeavourOS ARM Setup - Review Settings" --yesno "To review, you entered the following information:\n\n \
+      Time Zone: $timezone \n \
+      Host Name: $host_name \n \
+      User Name: $username \n \
+      SSH Port: $sshport \n \
+      Static IP: $staticip \n\n \
+      Is this information correct?" 16 80
+      userinputdone="$?"
+   fi
+
+done
+
+###################   end user input  ######################
 
 pacman -Syy
 
@@ -398,7 +626,10 @@ then
    pacman -S --noconfirm --needed - < base-addons
 else
    pacman -S --noconfirm --needed - < server-addons
-   pacman -Rn --noconfirm dhcpcd
+   dhcpcd_installed=$(pacman -Qs dhcpcd)
+    if [[ "$dhcpcd_installed" != "" ]]; then 
+      pacman -Rn --noconfirm dhcpcd
+   fi
 fi
 ok_nok   # function call
 
@@ -464,204 +695,6 @@ fi # boss fi
 
 pacman -Syy    # sync new endeavouros mirrorlist just installed above
 
-################   Begin user input  #######################
-userinputdone=1
-while [ $userinputdone -ne 0 ]
-do 
-   printf "\033c"; printf "\n"
-   country=""; zone=""; city=""; city2=""
-   
-   tzsource=/usr/share/zoneinfo
-
-   directory=$tzsource
-   if [ -d $directory ]
-   then
-      gettzentry   # function call
-      country=$entry    
-   fi
-
-   directory=$tzsource/$country
-   if  [ -d $directory ]
-   then   
-      gettzentry   # function call
-      zone=$entry
-   fi
-
-   directory=$tzsource/$country/$zone
-   if [ -d $directory ]
-   then
-      gettzentry   # function call
-      city=$entry
-   fi
-
-   directory=$tzsource/$country/$zone/$city
-   if [ -d $directory ]
-   then
-      gettzentry   # function call
-      city2=$entry
-   fi
-    
-   ############### end of time zone entry ##################################
-
-   finished=1
-   while [ $finished -ne 0 ]
-   do
-      printf "\nEnter your desired hostname: "
-      read host_name
-      if [ "$host_name" == "" ] 
-      then
-         printf "\nEntry is empty, try again\n"
-      else
-          finished=0
-      fi  
-   done
-
-   finished=1
-   while [ $finished -ne 0 ]
-   do 
-      printf "\nEnter your desired user name: "
-      read username
-      if [ "$username" == "" ]
-      then
-         printf "\nEntry is empty, try again\n"
-      else     
-         finished=0
-      fi
-   done
-   
-   if [ "$installtype" == "desktop" ]
-   then
-      finished=1
-      while [ $finished -ne 0 ]
-      do 
-         printf "\nEnter your Full Name: "
-         read fullname
-         if [ "$fullname" == "" ]
-         then
-            printf "\nEntry is empty, try again\n"
-         else     
-            finished=0
-         fi
-      done
-  
-   
-      finished=1
-      message=""
-      printf "\nChoose which Desktop Environment to install\n\n"
-      while [ $finished -ne 0 ]
-      do
-         printf "0 No Desktop Environment\n"
-         printf "1 XFCE4\n"
-         printf "2 Mate\n"
-         printf "3 KDE Plasma\n"
-         printf "4 Gnome\n"
-         printf "5 Cinnamon\n"
-         printf "6 Budgie-Desktop\n"
-         printf "7 LXQT\n"
-         printf "8 i3-wm"
-         printf "\n$message"
-         printf "\nEnter your choice of Desktop Environment "
-         read denum
-         finished=0
-         case $denum in
-            0) dename="none" ;;
-            1) dename="xfce4" ;;
-            2) dename="mate" ;;
-            3) dename="kde" ;;
-            4) dename="gnome" ;;
-            5) dename="cinnamon" ;;
-            6) dename="budgie" ;;
-            7) dename="lxqt" ;;
-            8) dename="i3wm" ;;
-            *) printf "${RED}ERROR:${NC} Out of range\n\n" 
-               message="\nEnter a number between 0 and 8 "
-               finished=1 ;;
-         esac
-      done
-   fi
-
-############################################################
-   
-   if [ "$installtype" == "server" ]
-   then
-     finished=1
-     while [ $finished -ne 0 ]
-     do
-        printf "\nEnter the desired SSH port between 8000 and 48000: "
-        read sshport
-        if [ "$sshport" -eq "$sshport" ] # 2>/dev/null
-        then
-             if [ $sshport -lt 8000 ] || [ $sshport -gt 48000 ]
-             then
-                printf "\nYour choice is out of range, try again\n"
-             else
-                finished=0
-             fi
-        else
-           printf "\nYour choice is not a number, try again\n"
-        fi
-     done
-
-     ethernetdevice=$(ip r | awk 'NR==1{print $5}')
-     routerip=$(ip r | awk 'NR==1{print $3}')
-     threetriads=$routerip
-     xyz=${threetriads#*.*.*.}
-     threetriads=${threetriads%$xyz}
-     printf "\nSETTING UP THE STATIC IP ADDRESS FOR THE SERVER\n"
-     finished=1
-     while [ $finished -ne 0 ]
-     do
-       printf "\nFor the best router compatibility, the last octet should be between 150 and 250\n"   
-       printf "Enter the last octet of the desired static IP address $threetriads"
-       read lasttriad
-       if [ "$lasttriad" -eq "$lasttriad" ] # 2>/dev/null
-       then
-          if [ $lasttriad -lt 150 ] || [ $lasttriad -gt 250 ]
-          then
-             printf "\n\nYour choice is out of range. Please try again\n"
-          else         
-            finished=0
-          fi
-       else
-          printf "\n\nYour choice is not a number.  Please try again\n"
-       fi
-     done
-     staticip=$threetriads$lasttriad
-     staticipbroadcast+=$staticip"/24"
-   fi  # boss fi
-   
-#######################################################   
-   
-   printf "\033c"; printf "\n"
-   printf "\nTo review, you entered the following information:\n"
-   printf "\nTime Zone = $country $zone $city $city2"
-   printf "\nHost Name = $host_name"
-   printf "\nUser Name = $username"
-   
-   if [ "$installtype" == "desktop" ]
-   then
-     printf "\nFull Name = $fullname"
-     printf "\nDesktop Environment = $dename"
-   fi
-   if [ "$installtype" == "server" ]
-   then
-      printf "\nSSH  port = $sshport"
-      printf "\nStatic IP = $staticip"
-   fi
-   
-   prompt="\n\nIs this informatin correct? [y,n,q] "
-   simple_yes_no
-   if [ $returnanswer == "y" ]
-   then
-      userinputdone=0
-   fi
-done
-
-###################   end user input  ######################
-
-
-
-
 printf "\n${CYAN}Setting Time Zone...${NC}\n"
 message="\nSetting Time Zone  "
 ln -sf $timezonepath /etc/localtime 2>> /root/enosARM.log
@@ -712,16 +745,9 @@ printf "\n${CYAN}Running mkinitcpio...${NC}\n"
 mkinitcpio -P  2>> /root/enosARM.log
 
 
-printf "\nEnter your ${CYAN}NEW ROOT${NC} password\n\n"
-finished=1
-while [ $finished -ne 0 ]
-do
-  if passwd ; then
-      finished=0 ; echo
-   else
-      finished=1 ; printf "\nPassword entry failed, try again\n\n"
-   fi
-done
+printf "\n${CYAN} Updating root user password...\n\n"
+echo "root:${root_user_password}" | chpasswd
+
 
 printf "\n${CYAN}Delete default username (alarm) and Creating a user...${NC}"
 message="Delete default username (alarm) and Creating new user "
@@ -732,17 +758,9 @@ then
 else
    useradd -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
 fi
-printf "\nEnter ${CYAN}USER${NC} password.\n\n"
-finished=1
-while [ $finished -ne 0 ]
-do
-  if passwd $username ; then
-      finished=0 ; echo
-   else
-      finished=1 ; printf "\nPassword entry failed, try again\n\n"
-   fi
-done
-ok_nok 
+printf "\n${CYAN} Updating user password...\n\n"
+echo "${username}:${user_password}" | chpasswd
+
 
 if [ "$installtype" == "desktop" ]
 then
@@ -800,7 +818,6 @@ then
    printf "\n${CYAN}Creating configuration file for static IP address...${NC}"
    message="\nCreating configuration file for static IP address "
    
-   #ethernetdevice=$(ip r | awk 'NR==1{print $5}')
    if [[ ${ethernetdevice:0:3} == "eth" ]]
    then
       rm /etc/systemd/network/eth*
@@ -846,10 +863,10 @@ then
    mkdir -p /etc/samba
    cp smb.conf /etc/samba/
    
-   prompt="\n\n${CYAN}Do you want to partition and format a USB 3 DATA SSD and auto mount it at bootup? [y,n] ${NC}"
-   simple_yes_no
-   if [ $returnanswer == "y" ]
-   then
+   whiptail  --title "EndeavourOS ARM Setup - SSD Configuration"  --yesno "Do you want to partition and format a USB 3 DATA SSD and auto mount it at bootup?" 8 86
+   user_confirmation="$?"
+
+   if [[ $user_confirmation == "0" ]]; then
       installssd
    fi
    
@@ -860,14 +877,6 @@ fi # boss fi
 # rebranding to EndeavourOS
 sed -i 's/Arch/EndeavourOS/' /etc/issue
 sed -i 's/Arch/EndeavourOS/' /etc/arch-release
-# sed -i -e s'|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' -e s'|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|' /etc/lsb-release
-# sed -i -e s'|^NAME=.*$|NAME=\"EndeavourOS\"|' -e s'|^PRETTY_NAME=.*$|PRETTY_NAME=\"EndeavourOS\"|' -e s'|^HOME_URL=.*$|HOME_URL=\"https://endeavouros.com\"|' -e s'|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL=\"https://endeavouros.com/wiki/\"|' -e s'|^SUPPORT_URL=.*$|SUPPORT_URL=\"https://forum.endeavouros.com\"|' -e s'|^BUG_REPORT_URL=.*$|BUG_REPORT_URL=\"https://github.com/endeavouros-team\"|' -e s'|^LOGO=.*$|LOGO=endeavouros|' /usr/lib/os-release
-#if [ ! -d "/etc/pacman.d/hooks" ]
-#then
-#   mkdir /etc/pacman.d/hooks  
-#fi
-#cp lsb-release.hook os-release.hook  /etc/pacman.d/hooks/
-#chmod 755 /etc/pacman.d/hooks/lsb-release.hook /etc/pacman.d/hooks/os-release.hook
 
 rm -rf /root/install-script
 
