@@ -5,7 +5,6 @@ lightdm
 lightdm-gtk-greeter
 lightdm-gtk-greeter-settings
 network-manager-applet
-gnome-packagekit
 gnome-software-packagekit-plugin
 xdg-user-dirs-gtk
 fwupd
