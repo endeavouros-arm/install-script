@@ -256,6 +256,7 @@ function kde {
    printf "\n${CYAN}Installing KDE Plasma...${NC}\n"
    message="\nInstalling KDE Plasma  "
    pacman -S --noconfirm --needed - < kde-pkg-list
+   pacman -Rs --noconfirm discover
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
@@ -266,6 +267,7 @@ function gnome {
    printf "\n${CYAN}Installing Gnome...${NC}\n"
    message="\nInstalling Gnome"
    pacman -S --noconfirm --needed - < gnome-pkg-list
+   pacman -R --noconfirm gnome-software
    ok_nok  # function call
    systemctl enable gdm.service
 }   # end of function gnome
