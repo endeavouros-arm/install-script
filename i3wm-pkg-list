@@ -12,11 +12,7 @@ polkit-gnome
 xdg-user-dirs-gtk
 thunar
 thunar-archive-plugin
-xarchiver
-zip
-unzip 
-unrar 
-p7zip
+file-roller
 thunar-volman
 tumbler
 xfce4-terminal
