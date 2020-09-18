@@ -24,7 +24,7 @@ function status_checker() {
    fi 
 }
 
-function ok_nok {
+function ok_nok() {
 # Requires that variable "message" be set
 status=$?
 if [[ $status -eq 0 ]]
@@ -41,83 +41,77 @@ sleep 1
 }	# end of function ok_nok
 
 
-function simple_yes_no {
+#function simple_yes_no {
 # Requires that variable "prompt" be set
-while true 
-do
-      printf "$prompt"
-      read answer 
-      answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]')
-      case $answer in
+#while true 
+#do
+#      printf "$prompt"
+#      read answer 
+#      answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]')
+#      case $answer in
+#
+#      [y]* ) returnanswer=$answer
+#              break
+#              ;;
+#
+#       [n]* ) returnanswer=$answer
+#              break
+#              ;;
+#
+#      [q]* ) exit
+#              ;;  
+#      * )     printf "\nTry again, Enter [y,n] :\n"
+#              true="false"
+#              ;;
+#   esac
+#done
+#}   # end of function  simple_yes_no
 
-      [y]* ) returnanswer=$answer
-              break
-              ;;
-
-       [n]* ) returnanswer=$answer
-              break
-              ;;
-
-      [q]* ) exit
-              ;;  
-
-      * )     printf "\nTry again, Enter [y,n] :\n"
-              true="false"
-              ;;
-   esac
-done
-}   # end of function  simple_yes_no
-
-function yes_no_input {
+#function yes_no_input {
 # Requires that variables "prompt" "message" and "verify" be set
-while true 
-do
+#while true 
+#do
      # (1)read command line argument
-     printf "$prompt"     
-     if [ $verify == "true" ]
-     then
-        read returnanswer          
-        read -p "You entered \" $returnanswer \" is this correct? [y,n,q] :" answer
-     else
-        read answer
-        returnanswer=$answer 
-     fi
+#     printf "$prompt"     
+#     if [ $verify == "true" ]
+#     then
+#        read returnanswer          
+#        read -p "You entered \" $returnanswer \" is this correct? [y,n,q] :" answer
+#     else
+#        read answer
+#        returnanswer=$answer 
+#     fi
      # (2) handle the input we were given
      # if y then continue, if n then exit script with $message
-     case $answer in
-      [yY]* ) printf "\n"
-              break;;
+#     case $answer in
+#      [yY]* ) printf "\n"
+#              break;;
+#      [nN]* ) if [ $verify == "true" ]
+#              then
+#                 printf "$message\n"
+#                 true="false"
+#              else
+#                 printf "$message\n"
+#                 exit
+#              fi
+#              ;;
+#
+#      [qQ]* ) exit
+#              ;;
+#
+#      * )     if [ $verify == "true" ]
+#              then
+#                 printf "\nTry again.\n"
+#              else 
+#                 printf "\nTry again, Enter [y,n] :\n"
+#              fi
+#              true="false"
+#              ;;
+#   esac
+#done
+#}    # end of function yes_no_input
 
-      [nN]* ) if [ $verify == "true" ]
-              then
-                 printf "$message\n"
-                 true="false"
-              else
-                 printf "$message\n"
-                 exit
-              fi
-              ;;
-
-      [qQ]* ) exit
-              ;;
-
-      * )     if [ $verify == "true" ]
-              then
-                 printf "\nTry again.\n"
-              else 
-                 printf "\nTry again, Enter [y,n] :\n"
-              fi
-              true="false"
-              ;;
-   esac
-done
-}    # end of function yes_no_input
-
-function installssd {
-
-
-
-
+function installssd() {
 whiptail  --title "EndeavourOS ARM Setup - SSD Configuration"  --yesno "Connect a USB 3 external enclosure with a SSD or hard drive installed\n\n \
 CAUTION: ALL data on this drive will be erased\n\n \
 Do you want to continue?" 12 80 
@@ -204,7 +198,7 @@ fi
 }  # end of function installssd
 
 
-function devicemodel {
+function devicemodel() {
    devicemodel=$(cat /proc/cpuinfo | grep "Raspberry Pi 4 Model B" | awk '{print $3,$4,$5,$6,$7}')
    if [[ $devicemodel == "Raspberry Pi 4 Model B" ]]
    then
@@ -232,7 +226,7 @@ function devicemodel {
 }   # end of function devicemodel
 
 
-function xfce4 {
+function xfce4() {
    printf "\n${CYAN}Installing XFCE4 ...${NC}\n"
    message="\nInstalling XFCE4  "
    pacman -S --noconfirm --needed - < xfce4-pkg-list
@@ -242,7 +236,7 @@ function xfce4 {
    systemctl enable lightdm.service
 }   # end of function xfce4
 
-function mate {
+function mate() {
    printf "\n${CYAN}Installing Mate...${NC}\n"
    message="\nInstalling Mate  "
    pacman -S --noconfirm --needed - < mate-pkg-list
@@ -252,7 +246,7 @@ function mate {
    systemctl enable lightdm.service
 }   # end of function mate
 
-function kde {
+function kde() {
    printf "\n${CYAN}Installing KDE Plasma...${NC}\n"
    message="\nInstalling KDE Plasma  "
    pacman -S --noconfirm --needed - < kde-pkg-list
@@ -263,16 +257,19 @@ function kde {
    systemctl enable lightdm.service
 }   # end of function kde
 
-function gnome {
+function gnome() {
    printf "\n${CYAN}Installing Gnome...${NC}\n"
    message="\nInstalling Gnome"
    pacman -S --noconfirm --needed - < gnome-pkg-list
-   pacman -R --noconfirm gnome-software
+#   pacman -R --noconfirm gnome-software
    ok_nok  # function call
-   systemctl enable gdm.service
+   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
+   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+   systemctl enable lightdm.service  
+   # systemctl enable gdm.service
 }   # end of function gnome
 
-function cinnamon {
+function cinnamon() {
   printf "\n${CYAN}Installing Cinnamon...${NC}\n"
   message="\nInstalling Cinnamon  "
   pacman -S --noconfirm --needed - < cinnamon-pkg-list
@@ -282,7 +279,7 @@ function cinnamon {
   systemctl enable lightdm.service
 }   # end of function cinnamon
 
-function budgie {
+function budgie() {
   printf "\n${CYAN}Installing Budgie-Desktop...${NC}\n"
   message="\nInstalling Budgie-Desktop"
   pacman -S --noconfirm --needed - < budgie-pkg-list
@@ -292,7 +289,7 @@ function budgie {
   systemctl enable lightdm.service
 }  # end of function budgie
 
-function lxqt {
+function lxqt() {
    printf "\n${CYAN}Installing LXQT...${NC}\n"
    message="\nInstalling LXQT  "
    pacman -S --noconfirm --needed - < lxqt-pkg-list
@@ -302,7 +299,7 @@ function lxqt {
    systemctl enable lightdm.service
 }   # end of function lxqt
 
-function i3wm {
+function i3wm() {
    printf "\n${CYAN}Installing i3-wm ...${NC}\n"
    message="\nInstalling i3-wm  "
    pacman -S --noconfirm --needed - < i3wm-pkg-list
@@ -626,6 +623,7 @@ sleep 2
 if [ "$installtype" == "desktop" ]
 then
    pacman -S --noconfirm --needed - < base-addons
+   systemctl enable dhcpcd.service
 else
    pacman -S --noconfirm --needed - < server-addons
    dhcpcd_installed=$(pacman -Qs dhcpcd)
@@ -702,6 +700,7 @@ message="\nSetting Time Zone  "
 ln -sf $timezonepath /etc/localtime 2>> /root/enosARM.log
 ok_nok  # function call
 
+
 printf "\n${CYAN}Enabling NTP...${NC}"
 message="\nEnabling NTP   "
 timedatectl set-ntp true &>> /root/enosARM.log
@@ -729,12 +728,11 @@ printf "\nLANG=en_US.UTF-8\n\n" > /etc/locale.conf
 ok_nok   # function call
 
 
-
-
 printf "\n${CYAN}Setting hostname...${NC}"
 message="\nSetting hostname "
 printf "\n$host_name\n\n" > /etc/hostname
 ok_nok   # function call
+
 
 printf "\n${CYAN}Configuring /etc/hosts...${NC}"
 message="\nConfiguring /etc/hosts "
@@ -742,6 +740,7 @@ printf "\n127.0.0.1\tlocalhost\n" > /etc/hosts
 printf "::1\t\tlocalhost\n" >> /etc/hosts
 printf "127.0.1.1\t$host_name.localdomain\t$host_name\n\n" >> /etc/hosts
 ok_nok  # function call
+
 
 printf "\n${CYAN}Running mkinitcpio...${NC}\n"
 mkinitcpio -P  2>> /root/enosARM.log
@@ -772,6 +771,7 @@ then
    gpasswd -a $username wheel    # add user to group wheel
 fi
 
+
 printf "\n${CYAN}Creating ll alias...${NC}"
 message="\nCreating ll alias "
 printf "\nalias ll='ls -l --color=auto'\n" >> /etc/bash.bashrc
@@ -794,8 +794,7 @@ then
       pacman -S --noconfirm --needed welcome yay endeavouros-theming eos-hooks
       pacman -S --noconfirm --needed pahis inxi  eos-log-tool eos-update-notifier downgrade
    fi
-   
-   devicemodel  # check to see if the device is a Raspberry Pi 4 b, if so enable HDMI audio
+ 
    if [ $dename == "i3wm" ]
    then 
       cd /home/$username
@@ -808,6 +807,7 @@ then
       cd
       sudo -u $username rm -rf /home/$username/i3-EndeavourOS
    fi
+   devicemodel  # Perform device specific chores   
 fi # boss fi
 
 ########################### end of desktop setup ##############################
@@ -839,7 +839,6 @@ then
    printf "DNS=8.8.8.8\n" >> $ethernetconf
    printf "DNSSEC=no\n" >> $ethernetconf
    
-
    printf "\n${CYAN}Configure SSH...${NC}"
    message="\nConfigure SSH "
    sed -i "/Port 22/c Port $sshport" /etc/ssh/sshd_config

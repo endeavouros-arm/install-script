@@ -8,3 +8,6 @@ xdg-user-dirs-gtk
 fwupd
 arc-x-icons-theme
 arc-gtk-theme
+lightdm
+lightdm-gtk-greeter
+lightdm-gtk-greeter-settings
