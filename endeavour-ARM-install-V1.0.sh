@@ -622,14 +622,9 @@ message="\nInstalling EndeavourOS Base Addons  "
 sleep 2
 if [ "$installtype" == "desktop" ]
 then
-   pacman -S --noconfirm --needed - < base-addons
-   systemctl enable dhcpcd.service
+   pacman -S --noconfirm --needed - < base-addons && systemctl enable dhcpcd.service
 else
-   pacman -S --noconfirm --needed - < server-addons
-   dhcpcd_installed=$(pacman -Qs dhcpcd)
-    if [[ "$dhcpcd_installed" != "" ]]; then 
-      pacman -Rn --noconfirm dhcpcd
-   fi
+   pacman -S --noconfirm --needed - < server-addons && pacman -Q dhcpcd &> /dev/null && pacman -Rn --noconfirm dhcpcd
 fi
 ok_nok   # function call
 
