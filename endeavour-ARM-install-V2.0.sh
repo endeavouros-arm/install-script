@@ -641,7 +641,7 @@ then
    printf "\n${CYAN}Find current endeavouros-mirrorlist...${NC}\n\n"
    message="\nFind current endeavouros-mirrorlist "
    sleep 1
-   curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$armarch | grep endeavouros-arm-mirrorlist |sed s'/^.*endeavouros-arm-mirrorlist/endeavouros-arm-mirrorlist/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g |tail -1 > mirrors
+   curl https://github.com/endeavouros-team/repo/tree/master/endeavouros/$armarch | grep endeavouros-mirrorlist |sed s'/^.*endeavouros-mirrorlist/endeavouros-mirrorlist/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g |tail -1 > mirrors
 
    file="mirrors"
    read -d $'\x04' currentmirrorlist < "$file"
@@ -649,15 +649,15 @@ then
 
    printf "\n${CYAN}Downloading endeavouros-mirrorlist...${NC}"
    message="\nDownloading endeavouros-mirrorlist "
-   wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$armarch/$currentmirrorlist 2>> logfile2
+   wget https://github.com/endeavouros-team/repo/raw/master/endeavouros/$armarch/$currentmirrorlist 2>> logfile2
    ok_nok      # function call
 
-   printf "\n${CYAN}Installing endeavouros-arm-mirrorlist...${NC}\n"
-   message="\nInstalling endeavouros-arm-mirrorlist "
+   printf "\n${CYAN}Installing endeavouros-mirrorlist...${NC}\n"
+   message="\nInstalling endeavouros-mirrorlist "
    pacman -U --noconfirm $currentmirrorlist &>> logfile2
    ok_nok    # function call
 
-   printf "\n[endeavouros-arm]\nSigLevel = PackageRequired\nInclude = /etc/pacman.d/endeavouros-arm-mirrorlist\n\n" >> /etc/pacman.conf
+   printf "\n[endeavouros]\nSigLevel = PackageRequired\nInclude = /etc/pacman.d/endeavouros-mirrorlist\n\n" >> /etc/pacman.conf
 
    # cleanup
    if [ -a $currentmirrorlist ]
