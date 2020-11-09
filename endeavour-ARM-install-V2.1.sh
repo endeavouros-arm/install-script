@@ -358,7 +358,6 @@ networkmanager_installed=$(pacman -Qs networkmanager)
 
 dhcpcd_installed=$(pacman -Qs dhcpcd)
   if [[ "$dhcpcd_installed" != "" ]]; then 
-    systemctl stop dhcpcd
     pacman -Rn --noconfirm dhcpcd
   fi
 
@@ -571,7 +570,7 @@ do
       whiptail  --title "EndeavourOS ARM Setup - Review Settings"  --yesno "To review, you entered the following information:\n\n \
       Time Zone: $timezone \n \
       Host Name: $host_name \n \
-      Full Name: $fullname \n \      
+      Full Name: $fullname \n \
       User Name: $username \n \
       Desktop Environment: $dename \n\n \
       Is this information correct?" 16 80
@@ -582,7 +581,7 @@ do
       whiptail --title "EndeavourOS ARM Setup - Review Settings" --yesno "To review, you entered the following information:\n\n \
       Time Zone: $timezone \n \
       Host Name: $host_name \n \
-      Full Name: $fullname \n \      
+      Full Name: $fullname \n \
       User Name: $username \n \
       SSH Port: $sshport \n \
       Static IP: $staticip \n\n \
