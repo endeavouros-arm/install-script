@@ -344,14 +344,18 @@ pacman -S --noconfirm --needed libnewt # for whiplash dialog
 
 ################   Begin user input  #######################
 
-installtype=$(whiptail --title "EndeavourOS ARM Setup"  --menu "Choose type of install" 10 50 2 "1" "Desktop Environment" "2" "Headless server Environment" 3>&2 2>&1 1>&3)
+installtype=$(whiptail --title "EndeavourOS ARM Setup"  --menu "\n          Choose type of install or\n      Press right arrow twice to cancel" 12 50 2 "1" "Desktop Environment" "2" "Headless server Environment" 3>&2 2>&1 1>&3)
 
 
-case $installtype in
+if [[ "$installtype" = "" ]]
+then
+   printf "\n\nScript aborted by user..${NC}\n\n" && exit
+else
+   case $installtype in
       1) installtype="desktop" ;;
       2) installtype="server" ;;
-esac
-
+   esac
+fi
 
 if [ "$installtype" == "desktop" ]
 then
