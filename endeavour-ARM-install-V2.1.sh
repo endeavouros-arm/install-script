@@ -55,22 +55,22 @@ then
    dialog_content="$base_dialog_content"
    while [ $finished -ne 0 ]
    do
-       devicename=$(whiptail --title "EndeavourOS ARM Setup - micro SD Configuration" --inputbox "$dialog_content" 27 115 3>&2 2>&1 1>&3)
+       datadevicename=$(whiptail --title "EndeavourOS ARM Setup - micro SD Configuration" --inputbox "$dialog_content" 27 115 3>&2 2>&1 1>&3)
       exit_status=$?
       if [ $exit_status == "1" ]; then           
-         printf "\nScript aborted by user\n\n"
-         exit
+         printf "\nInstall SSD aborted by user\n\n"
+         return
       fi
-      if [[ ! -b "$devicename" ]]; then  
+      if [[ ! -b "$datadevicename" ]]; then  
          dialog_content="$base_dialog_content\n    Not a listed block device, or not prefaced by /dev/ Try again."
       else   
-         case $devicename in
-            /dev/sd*)     if [[ ${#devicename} -eq 8 ]]; then 
+         case $datadevicename in
+            /dev/sd*)     if [[ ${#datadevicename} -eq 8 ]]; then 
                              finished=0
                           else
                              dialog_content="$base_dialog_content\n    Input improperly formatted. Try again."   
                           fi ;;
-            /dev/mmcblk*) if [[ ${#devicename} -eq 12 ]]; then 
+            /dev/mmcblk*) if [[ ${#datadevicename} -eq 12 ]]; then 
                              finished=0
                           else
                              dialog_content="$base_dialog_content\n    Input improperly formatted. Try again."   
@@ -79,27 +79,6 @@ then
       fi      
    done
 
-#  printf "\nPlease wait for a few seconds.\n"
-#  sleep 10
-#  finished=1
-#   base_dialog_content="The following storage devices were found\n\n$(lsblk -o NAME,FSTYPE,FSUSED,FSAVAIL,SIZE,MOUNTPOINT)\n\n \
-#   Enter target device name (e.g. /dev/sda):"
-#   dialog_content="$base_dialog_content"
-#  while [ $finished -ne 0 ]
-#  do
-#     datadevicename=$(whiptail --title "EndeavourOS ARM Setup - SSD Configuration" --inputbox "$dialog_content" 25 80 3>&2 2>&1 1>&3)
-#     exit_status=$?
-#     if [ $exit_status == "1" ]; then
-#         return
-#     fi
-#     if [[ ${datadevicename:0:5} != "/dev/" ]]; then 
-#           dialog_content="Input improperly formatted. Try again.\n\n$base_dialog_content"
-#     elif [[ ! -b "$datadevicename" ]]; then  
-#          dialog_content="Not a block device. Try again.\n\n$base_dialog_content"
-#     else 
-#        finished=0
-#     fi
-#  done     
 
   ##### Determine data device size in MiB and partition ###
   printf "\n${CYAN}Partitioning, & formatting DATA storage device...${NC}\n"
@@ -348,7 +327,6 @@ case "$armarch" in
 esac
 
 
-
 networkmanager_installed=$(pacman -Qs networkmanager)
   if [[ "$networkmanager" = "" ]]; then 
     pacman -S --noconfirm --needed networkmanager
@@ -361,7 +339,6 @@ dhcpcd_installed=$(pacman -Qs dhcpcd)
     pacman -Rn --noconfirm dhcpcd
   fi
 
-sleep 3
 
 pacman -S --noconfirm --needed libnewt # for whiplash dialog
 
