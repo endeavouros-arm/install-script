@@ -135,7 +135,7 @@ then
    printf "The mount point /serverbkup was also created for use in backing up the DATA device.\n"     
 fi
 printf "\n\nPress Enter to continue\n"
-read -n1 z
+read -n 1 z
 }  # end of function installssd
 
 
