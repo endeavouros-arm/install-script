@@ -611,7 +611,7 @@ fi
 printf "\n${CYAN}Find current endeavouros-keyring...${NC}\n\n"
 message="\nFind current endeavouros-keyring "
 sleep 1
-curl https://github.com/endeavouros-arm/repo/tree/master/endeavouros-arm/$armarch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g | tail -1 > keys 2>> /root/enosARM.log
+curl https://github.com/endeavouros-team/repo/tree/master/endeavouros/$armarch |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g | tail -1 > keys 2>> /root/enosARM.log
 
 file="keys"
 read -d $'\04' currentkeyring < "$file"
@@ -619,7 +619,7 @@ read -d $'\04' currentkeyring < "$file"
 
 printf "\n${CYAN}Downloading endeavouros-keyring...${NC}"
 message="\nDownloading endeavouros-keyring "
-wget https://github.com/endeavouros-arm/repo/raw/master/endeavouros-arm/$armarch/$currentkeyring 2>> /root/enosARM.log
+wget https://github.com/endeavouros-team/repo/raw/master/endeavouros/$armarch/$currentkeyring 2>> /root/enosARM.log
 ok_nok		# function call
 
 printf "\n${CYAN}Installing endeavouros-keyring...${NC}\n"
