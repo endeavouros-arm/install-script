@@ -38,17 +38,6 @@ openvpn
 gnu-netcat
 ndisc6
 pptpclient
-b43-fwcutter
-modemmanager
-wireless-tools
-e-links
-rp-pppoe
-wireless-regdb
-wpa_supplicant
-wvdial
-iwd
-linux-atm
-ppp
 vpnc
 xl2tpd
 dialog
