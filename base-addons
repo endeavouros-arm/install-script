@@ -39,7 +39,6 @@ gnu-netcat
 ndisc6
 pptpclient
 b43-fwcutter
-broadcom-wl-dkms
 modemmanager
 wireless-tools
 e-links
@@ -50,7 +49,6 @@ wvdial
 iwd
 linux-atm
 ppp
-r8168
 vpnc
 xl2tpd
 dialog
