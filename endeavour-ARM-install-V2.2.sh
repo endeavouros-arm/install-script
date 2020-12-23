@@ -143,9 +143,12 @@ function devicemodel() {
 devicemodel=$(dmesg | grep "Machine model" | sed -e '/Raspberry Pi/ c Raspberry Pi' -e '/ODROID-N2/ c ODROID-N2' -e '/Odroid XU4/ c Odroid XU4')
 case $devicemodel in
    "Raspberry Pi") printf "dtparam=audio=on\n" >> /boot/config.txt
+                   printf "# hdmi_group=1\n# hdmi-mode=4\n" >> /boot/config.txt
                    printf "disable_overscan=1\n" >> /boot/config.txt
                    printf "[pi4]\n#Enable DRM VC4 V3D driver on top of the dispmanx display\n" >> /boot/config.txt
-                   printf "dtoverlay=vc4-fkms-v3d\nmax_framebuffers=2\ngpu-mem=320\n" >> /boot/config.txt ;;                  
+                   printf "dtoverlay=vc4-fkms-v3d\n# over_voltage=5\n# arm_freq=2000\n# gpu_freq=750\n" >> /boot/config.txt
+                   printf "max_framebuffers=2\ngpu-mem=320\n" >> /boot/config.txt
+                   cp /boot/config.txt /boot/config.txt.bkup ;;                  
    "ODROID-N2")    pacman -S --noconfirm mali-utgard-meson-libgl-x11 ;;
    "Odroid XU4")   pacman -S --noconfirm odroid-xu3-libgl-headers odroid-xu3-libgl-x11 xf86-video-armsoc-odroid ;;
 esac
