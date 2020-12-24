@@ -60,6 +60,13 @@ ttf-caladea
 alsa-utils
 alsa-plugins
 alsa-firmware
+b43-fwcutter
+modemmanager
+elinks
+rp-pppoe
+wvdial
+iwd
+linux-atm
 hardinfo
 glances
 htop
