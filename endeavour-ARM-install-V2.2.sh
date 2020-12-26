@@ -233,6 +233,7 @@ function i3wm() {
    message="\nInstalling i3-wm  "
    pacman -S --noconfirm --needed - < i3wm-pkg-list
    ok_nok  # function call
+   cp gtkrc-2.0 /home/$username/.gtkrc-2.0
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
    systemctl enable lightdm.service
