@@ -148,7 +148,9 @@ case $devicemodel in
                    printf "[pi4]\n#Enable DRM VC4 V3D driver on top of the dispmanx display\n" >> /boot/config.txt
                    printf "dtoverlay=vc4-fkms-v3d\n# over_voltage=5\n# arm_freq=2000\n# gpu_freq=750\n" >> /boot/config.txt
                    printf "max_framebuffers=2\ngpu-mem=320\n" >> /boot/config.txt
-                   cp /boot/config.txt /boot/config.txt.bkup ;;                  
+                   cp /boot/config.txt /boot/config.txt.bkup
+                   pacman -S --noconfirm wireless-regdb crda
+                   sed -i 's/#WIRELESS_REGDOM="US"/WIRELESS_REGDOM="US"/g' /etc/conf.d/wireless-regdom ;;                  
    "ODROID-N2")    pacman -S --noconfirm mali-utgard-meson-libgl-x11 ;;
    "Odroid XU4")   pacman -S --noconfirm odroid-xu3-libgl-headers odroid-xu3-libgl-x11 xf86-video-armsoc-odroid ;;
 esac
