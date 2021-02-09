@@ -1,5 +1,6 @@
 lxqt
 xdg-utils
+sddm
 libpulse
 libstatgrab
 libsysstat
@@ -8,10 +9,11 @@ network-manager-applet
 oxygen-icons
 breeze
 breeze-gtk
-notepadqq
-smplayer
 featherpad
+smplayer
 pavucontrol-qt
-lightdm
-lightdm-gtk-greeter
-lightdm-gtk-greeter-settings
+xscreensaver
+print-manager
+kio-fuse
+kio-gdrive
+audiocd-kio

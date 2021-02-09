@@ -1,6 +1,5 @@
 mate
 mate-extra
-arc-gtk-theme
 celluloid
 network-manager-applet
 xdg-user-dirs-gtk
@@ -8,3 +7,13 @@ lightdm
 lightdm-gtk-greeter
 lightdm-gtk-greeter-settings
 arc-x-icons-theme
+arc-gtk-theme
+seahorse
+gvfs
+gvfs-mtp
+gvfs-afc
+gvfs-goa
+gvfs-google
+gvfs-gphoto2
+gvfs-nfs
+gvfs-smb
