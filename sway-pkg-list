@@ -31,6 +31,14 @@ wayland-protocols
 xorg-xwayland
 egl-wayland
 gtk-layer-shell
+gvfs
+gvfs-mtp
+gvfs-afc
+gvfs-goa
+gvfs-google
+gvfs-gphoto2
+gvfs-nfs
+gvfs-smb
 ttf-nerd-fonts-symbols
 ttf-jetbrains-mono
 xdg-desktop-portal-wlr
