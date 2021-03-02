@@ -151,7 +151,7 @@ case $devicemodel in
                    cp /boot/config.txt /boot/config.txt.bkup
                    pacman -S --noconfirm wireless-regdb crda
                    sed -i 's/#WIRELESS_REGDOM="US"/WIRELESS_REGDOM="US"/g' /etc/conf.d/wireless-regdom ;;                  
-   "ODROID-N2")    pacman -S --noconfirm mali-utgard-meson-libgl-x11 xf86-video-fbturbo-git ;;
+#   "ODROID-N2")    pacman -S --noconfirm mali-utgard-meson-libgl-x11 xf86-video-fbturbo-git ;;
    "Odroid XU4")   pacman -S --noconfirm odroid-xu3-libgl-headers odroid-xu3-libgl-x11 xf86-video-armsoc-odroid xf86-video-fbturbo-git ;;
 esac
 }   # end of function devicemodel
@@ -197,8 +197,8 @@ function gnome() {
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-   systemctl enable lightdm.service  
-   # systemctl enable gdm.service
+#   systemctl enable lightdm.service  
+   systemctl enable gdm.service
 }   # end of function gnome
 
 function cinnamon() {
