@@ -318,7 +318,7 @@ case $devicemodel in
                    sed -i 's/#WIRELESS_REGDOM="US"/WIRELESS_REGDOM="US"/g' /etc/conf.d/wireless-regdom ;;
    "ODROID-N2")    cp /root/install-script/n2-boot.ini /boot/boot.ini
                    lsblk -f | grep sda >/dev/null
-                   if [ $? =0 ]
+                   if [ $? = 0 ]
                    then
                       sed -i 's/root=\/dev\/mmcblk${devno}p2/root=\/dev\/sda2/g' /boot/boot.ini      
                    fi
