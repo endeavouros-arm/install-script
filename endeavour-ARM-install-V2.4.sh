@@ -955,7 +955,12 @@ then
          cp /usr/share/applications/welcome.desktop /etc/xdg/autostart/
       fi
    fi
-   devicemodel  # Perform device specific chores   
+   devicemodel  # Perform device specific chores
+   FILENAME="/etc/lightdm/lightdm.conf"
+   if [ -f $FILENAME ]
+   then
+      sed -i 's/#logind-check-graphical=false/logind-check-graphical=true/g' $FILENAME
+   fi  
 fi
 
 ########################### end of desktop setup ##############################
