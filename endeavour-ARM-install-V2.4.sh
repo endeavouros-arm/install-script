@@ -78,16 +78,10 @@ rm linetype
 
 function create-base-addons() {
    case $dename in
-      xfce4) wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml ;;
-      mate) wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml ;;
-      kde) wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml ;;
-      gnome) wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml ;;
-      cinnamon) wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml ;;
-      budgie) wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml ;;
-      lxqt) wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml ;;
-      i3wm) wget https://raw.githubusercontent.com/endeavouros-team/endeavouros-i3wm-setup/master/netinstall.yaml ;;
-      sway) wget https://raw.githubusercontent.com/endeavouros-community-editions/sway/master/netinstall.yaml ;;
+       i3wm) wget https://raw.githubusercontent.com/endeavouros-team/endeavouros-i3wm-setup/master/netinstall.yaml ;;
+       sway) wget https://raw.githubusercontent.com/endeavouros-community-editions/sway/master/netinstall.yaml ;;
       bspwm) wget https://raw.githubusercontent.com/endeavouros-community-editions/bspwm/master/netinstall.yaml ;;
+          *) wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml ;;
    esac
  
    base_pkg=( blank )
@@ -948,8 +942,7 @@ then
    if [ $dename != "none" ]     
    then
       $dename      # run appropriate function for installing Desktop Environment
-      pacman -S --noconfirm --needed welcome yay endeavouros-theming eos-hooks
-      pacman -S --noconfirm --needed pahis inxi  eos-log-tool eos-update-notifier downgrade
+      pacman -S --noconfirm --needed pahis downgrade
       if [ $dename == "sway" ]
       then
          cp /usr/share/applications/welcome.desktop /etc/xdg/autostart/
