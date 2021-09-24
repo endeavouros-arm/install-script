@@ -3,6 +3,7 @@ base-devel
 broadcom-wl-dkms
 dnsutils
 efibootmgr
+eos-rankmirrors
 firefox-i18n-$LOCALE
 grub-tools
 hwinfo
@@ -13,10 +14,11 @@ keyserver-rank
 linux-firmware
 linux-headers
 mkinitcpio-openswap
-nvidia-installer-dkms
+os-prober
 r8168
 reflector
 reflector-simple
+tlp
+upower
 xf86-video-ati
 xf86-video-intel
-eos-rankmirrors
