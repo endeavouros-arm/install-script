@@ -356,7 +356,6 @@ function kde() {
 #   windowmanager="false"
 #   create-pkg-list
    pacman -S --noconfirm --needed - < kde-pkgs
-   pacman -Rs --noconfirm discover
    ok_nok  # function call
 #   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
 #   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
