@@ -3,6 +3,7 @@ base-devel
 broadcom-wl-dkms
 dnsutils
 dmraid
+downgrade
 efibootmgr
 efitools
 eos-rankmirrors
