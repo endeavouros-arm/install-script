@@ -2,9 +2,11 @@ amd-ucode
 base-devel
 broadcom-wl-dkms
 dnsutils
+dmraid
 efibootmgr
+efitools
 eos-rankmirrors
-firefox-i18n-$LOCALE
+git
 grub-tools
 hwinfo
 intel-ucode
@@ -13,11 +15,13 @@ ipw2200-fw
 keyserver-rank
 linux-firmware
 linux-headers
+lsscsi
 mkinitcpio-openswap
-os-prober
+nilfs-utils
 r8168
 reflector
 reflector-simple
+sg3_utils
 tlp
 upower
 xf86-video-ati

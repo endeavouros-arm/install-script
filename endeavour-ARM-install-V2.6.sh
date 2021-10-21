@@ -41,106 +41,6 @@ sleep 1
 }	# end of function ok_nok
 
 
-#function create-pkg-list() {
-#if [ $windowmanager == "true" ]
-#then
-#   su $username -c "git clone https://github.com/$gittarget"
-#   cd /home/$username/$targetde
-#else
-#   if [ ! -f netinstall.yaml ]
-#   then
-#      wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml
-#   fi
-#fi
-#startnumber=$(grep -n "$targetgroup" netinstall.yaml | awk -F':' '{print $1}')
-#startnumber=$(($startnumber + 6))
-#currentno=$startnumber
-#if [ -f "pkg-list" ]
-#then
-#   rm pkg-list
-#fi
-#finished=1
-#while [ $finished -ne 0 ]
-#do
-#    awk -v "lineno=$currentno" 'NR==lineno' netinstall.yaml > linetype
-#    teststring=$(awk -F':' '{print $1}' linetype)
-#    if [ "$teststring" == "- name" ]
-#    then
-#       finished=0
-#    else
-#       awk '{print $2}' linetype >> pkg-list
-#       currentno=$(($currentno+1))
-#    fi
-#done
-#rm linetype
-#}       # end of function create-pkg-list
-
-
-#function create-base-addons() {
-#   case $dename in
-#       i3wm) wget https://raw.githubusercontent.com/endeavouros-team/endeavouros-i3wm-setup/master/netinstall.yaml ;;
-#       sway) wget https://raw.githubusercontent.com/endeavouros-community-editions/sway/master/netinstall.yaml ;;
-#      bspwm) wget https://raw.githubusercontent.com/endeavouros-community-editions/bspwm/master/netinstall.yaml ;;
-#          *) wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml ;;
-#   esac
-#
-#   base_pkg=( blank )
-#   startnumber=$(grep -n "name: \"Base-devel + Common packages\"" netinstall.yaml | awk -F':' '{print $1}')
-#   currentno=$(($startnumber + 6 ))
-#   a=0
-#   finished=1
-#  while [ $finished -ne 0 ]
-#   do
-#      teststring=$(awk -v "lineno=$currentno" 'NR==lineno' netinstall.yaml)
-#      if [[ $teststring == *"- name"* ]]
-#      then
-#         finished=0
-#      else
-#         teststring=$(echo "$teststring" | cut -c 7-)
-#         base_pkg[$a]="$teststring"
-#         currentno=$(($currentno+1))
-#         a=$(($a+1))
-#      fi
-#   done
-#   END=$(wc -l blacklist | awk '{print $1}')
-#  x=1
-#   while [[ $x -le $END ]]
-#   do
-#     temparray=( blank )
-#      a=0
-#      pattern=$(awk -v c=$x 'NR==c' blacklist)
-#     filelen=${#base_pkg[@]}
-#      for (( i=0; i<${filelen}; i++ ))
-#      do
-#         if [ "$pattern" != ${base_pkg[$i]} ]
-#         then
-#            temparray[$a]="${base_pkg[$i]}"
-#            ((a = a + 1))
-#         fi
-#      done
-#    base_pkg=("${temparray[@]}")
-#   ((x = x + 1))
-#   done
-#
-#   if [ -f "base-addons" ]
-#   then
-#      rm base-addons
-#   fi
-#   flen=${#base_pkg[@]}
-#   for (( i=0; i<${flen}; i++ ))
-#   do
-#      echo ${base_pkg[$i]} >> base-addons
-#   done
-#   ####  add sudo to parsed base-addons file
-#   if [ "$installtype" == "desktop" ]
-#   then
-#      printf "sudo\n" >> base-addons
-#   fi
-#   ####  stop adding packages to base-addons file
-#   rm netinstall.yaml
-#}  # end of function create-base-addons
-
-
 function findmirrorlist() {
 # find and install current endevouros-arm-mirrorlist  
 printf "\n${CYAN}Find current endeavouros-mirrorlist...${NC}\n\n"
@@ -298,6 +198,48 @@ printf "\n\nPress Enter to continue\n"
 read -n 1 z
 }  # end of function installssd
 
+function create-base-addons() {
+   wget https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/eos-base-group
+   readarray -t base_pkg < eos-base-group
+   declare -p base_pkg
+
+   END=$(wc -l blacklist | awk '{print $1}')
+   x=1
+   while [[ $x -le $END ]]
+   do
+     temparray=( blank )
+      a=0
+      pattern=$(awk -v c=$x 'NR==c' blacklist)
+     filelen=${#base_pkg[@]}
+      for (( i=0; i<${filelen}; i++ ))
+      do
+         if [ "$pattern" != ${base_pkg[$i]} ]
+         then
+            temparray[$a]="${base_pkg[$i]}"
+            ((a = a + 1))
+         fi
+      done
+    base_pkg=("${temparray[@]}")
+   ((x = x + 1))
+   done
+
+   if [ -f "base-addons" ]
+   then
+      rm base-addons
+   fi
+   flen=${#base_pkg[@]}
+   for (( i=0; i<${flen}; i++ ))
+   do
+      echo ${base_pkg[$i]} >> base-addons
+   done
+
+   ####  add sudo to parsed base-addons file
+   if [ "$installtype" == "desktop" ]
+   then
+      printf "sudo\n" >> base-addons
+   fi
+}    # end of function create-base-addons
+
 
 function devicemodel() {
 case $devicemodel in
@@ -308,7 +250,7 @@ case $devicemodel in
                    printf "dtoverlay=vc4-kms-v3d\n# over_voltage=5\n# arm_freq=2000\n# gpu_freq=750\n" >> /boot/config.txt
                    printf "max_framebuffers=2\ngpu-mem=320\n" >> /boot/config.txt
                    cp /boot/config.txt /boot/config.txt.bkup
-                   pacman -S --noconfirm wireless-regdb crda
+                   pacman -S --noconfirm --needed wireless-regdb crda
                    sed -i 's/#WIRELESS_REGDOM="US"/WIRELESS_REGDOM="US"/g' /etc/conf.d/wireless-regdom ;;
    "ODROID-N2")    cp /root/install-script/n2-boot.ini /boot/boot.ini
                    lsblk -f | grep sda >/dev/null
@@ -326,10 +268,8 @@ esac
 function xfce4() {
    printf "\n${CYAN}Installing XFCE4 ...${NC}\n"
    message="\nInstalling XFCE4  "
-#   targetgroup="name: \"XFCE4-Desktop\""
-#   windowmanager="false"
-#   create-pkg-list
-   pacman -S --noconfirm --needed - < xfce4-pkgs
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/xfce4
+   pacman -S --noconfirm --needed - < xfce4
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
@@ -339,10 +279,8 @@ function xfce4() {
 function mate() {
    printf "\n${CYAN}Installing Mate...${NC}\n"
    message="\nInstalling Mate  "
-#   targetgroup="name: \"MATE-Desktop\""
-#   windowmanager="false"
-#   create-pkg-list
-   pacman -S --noconfirm --needed - < mate-pkgs
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/mate
+   pacman -S --noconfirm --needed - < mate
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
@@ -352,25 +290,17 @@ function mate() {
 function kde() {
    printf "\n${CYAN}Installing KDE Plasma...${NC}\n"
    message="\nInstalling KDE Plasma  "
-#   targetgroup="name: \"KDE-Desktop\""
-#   windowmanager="false"
-#   create-pkg-list
-   pacman -S --noconfirm --needed - < kde-pkgs
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/plasma
+   pacman -S --noconfirm --needed - < plasma
    ok_nok  # function call
-#   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
-#   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-#   systemctl enable lightdm.service
    systemctl enable sddm.service
 }   # end of function kde
 
 function gnome() {
    printf "\n${CYAN}Installing Gnome...${NC}\n"
    message="\nInstalling Gnome  "
-#   gittarget="endeavouros-team/"$targetde".git"
-#   targetgroup="name: \"GNOME-Desktop\""
-#   windowmanager="false"
-#   create-pkg-list
-   pacman -S --noconfirm --needed - < gnome-pkgs
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/gnome
+   pacman -S --noconfirm --needed - < gnome
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
@@ -381,10 +311,8 @@ function gnome() {
 function cinnamon() {
   printf "\n${CYAN}Installing Cinnamon...${NC}\n"
   message="\nInstalling Cinnamon  "
-#  targetgroup="name: \"Cinnamon-Desktop\""
-# windowmanager="false"
-#  create-pkg-list
-  pacman -S --noconfirm --needed - < cinnamon-pkgs
+  wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/cinnamon
+  pacman -S --noconfirm --needed - < cinnamon
   ok_nok  # function call
   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
@@ -394,10 +322,8 @@ function cinnamon() {
 function budgie() {
   printf "\n${CYAN}Installing Budgie-Desktop...${NC}\n"
   message="\nInstalling Budgie-Desktop"
-#  targetgroup="name: \"Budgie-Desktop\""
-#  windowmanager="false"
-#  create-pkg-list
-  pacman -S --noconfirm --needed - < budgie-pkgs
+  wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/budgie
+  pacman -S --noconfirm --needed - < budgie
   ok_nok  # function call
   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
@@ -407,10 +333,8 @@ function budgie() {
 function lxqt() {
    printf "\n${CYAN}Installing LXQT...${NC}\n"
    message="\nInstalling LXQT  "
-#   targetgroup="name: \"LXQT-Desktop\""
-#   windowmanager="false"
-#   create-pkg-list
-   pacman -S --noconfirm --needed - < lxqt-pkgs
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/lxqt
+   pacman -S --noconfirm --needed - < lxqt
    ok_nok  # function call
 #   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
 #   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
@@ -421,24 +345,9 @@ function lxqt() {
 function i3wm() {
    printf "\n${CYAN}Installing i3-wm ...${NC}\n"
    message="\nInstalling i3-wm  "
-#   targetde="endeavouros-i3wm-setup"
-#   gittarget="endeavouros-team/"$targetde".git"
-#   targetgroup="name: \"i3 Window Manager\""
-#   windowmanager="true"
-#   create-pkg-list
-   pacman -S --noconfirm --needed - < i3wm-pkgs
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/i3
+   pacman -S --noconfirm --needed - < i3
    ok_nok  # function call
-   # configure i3wm
-#   cd /home/$username
-#   su $username -c "git clone https://github.com/endeavouros-team/endeavouros-i3wm-setup.git"
-#   su $username -c "mkdir /home/$username/.config"
-#   cd endeavouros-i3wm-setup
-#   su $username -c "cp -R .config/* /home/$username/.config/"
-#   su $username -c "cp .gtkrc-2.0 .nanorc /home/$username/"
-#   su $username -c "chmod -R +x /home/$username/.config/i3/scripts"
-#   dbus-launch dconf load / < xed.dconf
-#   su $username -c "sed -i 's|\(exec --no-startup-id ~/set_once.sh\)|# \1|' ~/.config/i3/config"
-#   cd /root/install-script
    su $username -c "rm -rf /home/$username/endeavouros-i3wm-setup"
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
@@ -448,26 +357,9 @@ function i3wm() {
 function sway() {
    printf "\n${CYAN}Installing Sway WM ...${NC}\n"
    message="\nInstalling Sway WM  "
-#   targetde="sway"
-#   gittarget="EndeavourOS-Community-Editions/"$targetde".git"
-#   targetgroup="name: \"sway tiling on wayland\""
-#   windowmanager="true"
-#   create-pkg-list
-   pacman -S --noconfirm --needed - < sway-pkgs
+   wget -q https://github.com/endeavouros-team/calamares_config_next/raw/master/calamares/ce/sway.txt
+   pacman -S --noconfirm --needed - < sway.txt
    ok_nok  # function call
-#  configure Sway
-#   cd /home/$username
-#   su $username -c "git clone https://github.com/EndeavourOS-Community-Editions/sway.git"
-#   su $username -c "mkdir /home/$username/.config"
-#   su $username -c "cp -R .config/* /home/$username/.config/"
-#   su $username -c "cp -R .profile /home/$username/.profile"
-#   su $username -c "cp .gtkrc-2.0 /home/$username/"
-#   su $username -c "chmod -R +x /home/$username/.config/sway/scripts"
-#   su $username -c "chmod -R +x /home/$username/.config/waybar/scripts"
-#   su $username -c "chmod +x /home/$username/.config/wofi/windows.py"
-#   dbus-launch dconf load / < xed.dconf
-#   cd /root/install-script
-#   su $username -c "rm -rf /home/$username/sway"
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
    systemctl enable lightdm.service
@@ -479,29 +371,9 @@ function sway() {
 function bspwm() {
    printf "\n${CYAN}Installing BSPWM ...${NC}\n"
    message="\nInstalling BSPWM  "
-#   targetde="bspwm"
-#   gittarget="EndeavourOS-Community-Editions/"$targetde".git"
-#   targetgroup="name: \"bspwm\""
-#   windowmanager="true"
-#   create-pkg-list
-   pacman -S --noconfirm --needed - < bspwm-pkgs
+   wget -q https://github.com/endeavouros-team/calamares_config_next/raw/master/calamares/ce/bspwm.txt
+   pacman -S --noconfirm --needed - < bspwm.txt
    ok_nok  # function call
-#  configure BSPWM
-#   cd /home/$username
-#   su $username -c "git clone https://github.com/EndeavourOS-Community-Editions/bspwm.git"
-#   su $username -c "mkdir /home/$username/.config"
-#   su $username -c "mkdir /home/$username/.local"
-#   su $username -c "mkdir /home/$username/.local/share"
-#   su $username -c "mkdir /home/$username/.local/share/fonts"
-#   su $username -c "cp -R IosevkaTermNerdFontComplete.ttf  /home/$username/.local/share/fonts"
-#   su $username -c "cp -R .config/* /home/$username/.config/"
-#   su $username -c "cp .gtkrc-2.0 /home/$username/"
-#   su $username -c "chmod -R +x /home/$username/.config/bspwm/"
-#   su $username -c "chmod -R +x /home/$username/.config/sxhkd/"
-#   su $username -c "chmod -R +x /home/$username/.config/polybar/scripts  "
-#   fc-cache -f -v
-#   cd /root/install-script
-#   su $username -c "rm -rf /home/$username/bspwm"
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
    systemctl enable lightdm.service
@@ -838,8 +710,8 @@ message="\nInstalling EndeavourOS Base Addons  "
 sleep 2
 if [ "$installtype" == "desktop" ]
 then
-#   create-base-addons
-   pacman -S --noconfirm --needed - < base-pkgs
+   create-base-addons
+   pacman -S --noconfirm --needed - < base-addons
    systemctl disable dhcpcd.service
    systemctl enable NetworkManager.service
    systemctl start NetworkManager.service     
@@ -951,7 +823,7 @@ then
    if [ $dename != "none" ]     
    then
       $dename      # run appropriate function for installing Desktop Environment
-      pacman -S --noconfirm --needed pahis downgrade
+      pacman -S --noconfirm --needed pahis
       if [ $dename == "sway" ]
       then
          cp /usr/share/applications/welcome.desktop /etc/xdg/autostart/
@@ -971,7 +843,7 @@ fi
 
 if [ "$installtype" = "server" ]
 then
-   pacman -S --noconfirm --needed pahis inxi downgrade yay
+   pacman -S --noconfirm --needed pahis inxi yay
    # create /etc/netctl/ethernet-static file with user supplied static IP
    printf "\n${CYAN}Creating configuration file for static IP address...${NC}"
    message="\nCreating configuration file for static IP address "
