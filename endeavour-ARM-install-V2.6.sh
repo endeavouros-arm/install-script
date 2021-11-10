@@ -244,10 +244,12 @@ function create-base-addons() {
 function devicemodel() {
 case $devicemodel in
    "Raspberry Pi") printf "dtparam=audio=on\n" >> /boot/config.txt
-                   printf "# hdmi_group=1\n# hdmi_mode=4\n" >> /boot/config.txt
+#                   printf "# hdmi_group=1\n# hdmi_mode=4\n" >> /boot/config.txt
                    printf "disable_overscan=1\n" >> /boot/config.txt
                    printf "[pi4]\n#Enable DRM VC4 V3D driver on top of the dispmanx display\n" >> /boot/config.txt
-                   printf "dtoverlay=vc4-kms-v3d\n# over_voltage=5\n# arm_freq=2000\n# gpu_freq=750\n" >> /boot/config.txt
+                   printf "dtoverlay=vc4-kms-v3d\n" >> /boot/config.txt
+                   printf "#Run as fast as firmware \/ board allows/n" >> /boot/config.txt
+                   printf "arm_boost=1\n#over_voltage=5\n# arm_freq=2000\n# gpu_freq=750\n" >> /boot/config.txt
                    printf "max_framebuffers=2\ngpu-mem=320\n" >> /boot/config.txt
                    cp /boot/config.txt /boot/config.txt.bkup
                    pacman -S --noconfirm --needed wireless-regdb crda
