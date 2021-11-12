@@ -243,7 +243,8 @@ function create-base-addons() {
 
 function devicemodel() {
 case $devicemodel in
-   "Raspberry Pi") #printf "dtparam=audio=on\n" >> /boot/config.txt
+   "Raspberry Pi") cp /boot/config.txt /boot/config.txt.orig
+                   #printf "dtparam=audio=on\n" >> /boot/config.txt
                    #printf "# hdmi_group=1\n# hdmi_mode=4\n" >> /boot/config.txt
                    #printf "disable_overscan=1\n" >> /boot/config.txt
                    printf "#over_voltage=5\n# arm_freq=2000\n# gpu_freq=750\n" >> /boot/config.txt
