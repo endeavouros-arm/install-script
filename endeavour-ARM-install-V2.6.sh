@@ -357,8 +357,8 @@ function i3wm() {
 function sway() {
    printf "\n${CYAN}Installing Sway WM ...${NC}\n"
    message="\nInstalling Sway WM  "
-   wget -q https://github.com/endeavouros-team/calamares_config_next/raw/master/calamares/ce/sway.txt
-   pacman -S --noconfirm --needed - < sway.txt
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/sway
+   pacman -S --noconfirm --needed - < sway
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
@@ -371,8 +371,8 @@ function sway() {
 function bspwm() {
    printf "\n${CYAN}Installing BSPWM ...${NC}\n"
    message="\nInstalling BSPWM  "
-   wget -q https://github.com/endeavouros-team/calamares_config_next/raw/master/calamares/ce/bspwm.txt
-   pacman -S --noconfirm --needed - < bspwm.txt
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/bspwm
+   pacman -S --noconfirm --needed - < bspwm
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
