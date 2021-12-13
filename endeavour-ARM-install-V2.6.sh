@@ -100,6 +100,29 @@ fi
 rm keys
 }   # End of function findkeyring
 
+function changeuseralarm() {
+printf "\n${CYAN}Delete default username (alarm) and Creating a user...${NC}"
+message="Delete default username (alarm) and Creating new user "
+userdel -r alarm     #delete the default user from the image
+if [ "$installtype" == "desktop" ]
+then
+   useradd -c "$fullname" -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
+else
+   useradd -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
+fi
+printf "\n${CYAN} Updating user password...\n\n"
+echo "${username}:${user_password}" | chpasswd
+
+
+if [ "$installtype" == "desktop" ]
+then
+   printf "\n${CYAN}Adding user $username to sudo wheel...${NC}"
+   message="Adding user $username to sudo wheel "
+   printf "$username  ALL=(ALL:ALL) ALL" >> /etc/sudoers
+   gpasswd -a $username wheel    # add user to group wheel
+fi
+}   # End of function changeuseralarm
+
 
 function installssd() {
 whiptail  --title "EndeavourOS ARM Setup - SSD Configuration"  --yesno "Connect a USB 3 external enclosure with a SSD or hard drive installed\n\n \
@@ -776,33 +799,32 @@ mkinitcpio -P  2>> /root/enosARM.log
 printf "\n${CYAN} Updating root user password...\n\n"
 echo "root:${root_user_password}" | chpasswd
 
-case $dename in
-   i3wm) pacman -S --noconfirm --needed endeavouros-skel-i3wm ;;
-  xfce4) pacman -S --noconfirm --needed endeavouros-skel-xfce4 ;;
-   sway) pacman -S --noconfirm --needed eos-skel-ce-sway ;;
-  bspwm) pacman -S --noconfirm --needed eos-skel-ce-bspwm ;;
-esac
+# case $dename in
+#   i3wm) pacman -S --noconfirm --needed endeavouros-skel-i3wm ;;
+#  xfce4) pacman -S --noconfirm --needed endeavouros-skel-xfce4 ;;
+#   sway) pacman -S --noconfirm --needed eos-skel-ce-sway ;;
+#  bspwm) pacman -S --noconfirm --needed eos-skel-ce-bspwm ;;
+# esac
 
-printf "\n${CYAN}Delete default username (alarm) and Creating a user...${NC}"
-message="Delete default username (alarm) and Creating new user "
-userdel -r alarm     #delete the default user from the image
-if [ "$installtype" == "desktop" ]
-then
-   useradd -c "$fullname" -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
-else
-   useradd -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
-fi
-printf "\n${CYAN} Updating user password...\n\n"
-echo "${username}:${user_password}" | chpasswd
+#printf "\n${CYAN}Delete default username (alarm) and Creating a user...${NC}"
+#message="Delete default username (alarm) and Creating new user "
+#userdel -r alarm     #delete the default user from the image
+#if [ "$installtype" == "desktop" ]
+#then
+#   useradd -c "$fullname" -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
+#else
+#   useradd -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
+#fi
+#printf "\n${CYAN} Updating user password...\n\n"
+#echo "${username}:${user_password}" | chpasswd
 
-
-if [ "$installtype" == "desktop" ]
-then
-   printf "\n${CYAN}Adding user $username to sudo wheel...${NC}"
-   message="Adding user $username to sudo wheel "
-   printf "$username  ALL=(ALL:ALL) ALL" >> /etc/sudoers
-   gpasswd -a $username wheel    # add user to group wheel
-fi
+#if [ "$installtype" == "desktop" ]
+#then
+#   printf "\n${CYAN}Adding user $username to sudo wheel...${NC}"
+#   message="Adding user $username to sudo wheel "
+#   printf "$username  ALL=(ALL:ALL) ALL" >> /etc/sudoers
+#   gpasswd -a $username wheel    # add user to group wheel
+#fi
 
 
 printf "\n${CYAN}Creating ll alias...${NC}"
@@ -819,7 +841,7 @@ pacman -Syy
 if [ "$installtype" == "desktop" ]
 then
    mkdir -p /usr/share/endeavouros/backgrounds
-   cp lightdmbackground.png /usr/share/endeavouros/backgrounds
+   cp lightdmbackground.png /usr/share/endeavouros/backgrounds/
    if [ $dename != "none" ]     
    then
       $dename      # run appropriate function for installing Desktop Environment
@@ -829,6 +851,7 @@ then
          cp /usr/share/applications/welcome.desktop /etc/xdg/autostart/
       fi
    fi
+   changeuseralarm    # remove user alarm and create new user of choice
    devicemodel  # Perform device specific chores
    FILENAME="/etc/lightdm/lightdm.conf"
    if [ -f $FILENAME ]
@@ -844,6 +867,7 @@ fi
 if [ "$installtype" = "server" ]
 then
    pacman -S --noconfirm --needed pahis inxi yay
+   changeuseralarm    # remove user alarm and create new user of choice
    # create /etc/netctl/ethernet-static file with user supplied static IP
    printf "\n${CYAN}Creating configuration file for static IP address...${NC}"
    message="\nCreating configuration file for static IP address "
