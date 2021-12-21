@@ -292,6 +292,7 @@ function xfce4() {
    printf "\n${CYAN}Installing XFCE4 ...${NC}\n"
    message="\nInstalling XFCE4  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/xfce4
+   printf "endeavouros-skel-xfce4\n" >> xfce4
    pacman -S --noconfirm --needed - < xfce4
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
@@ -369,11 +370,14 @@ function i3wm() {
    printf "\n${CYAN}Installing i3-wm ...${NC}\n"
    message="\nInstalling i3-wm  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/i3
+   printf "endeavouros-skel-i3wm\n" >> i3
    pacman -S --noconfirm --needed - < i3
    ok_nok  # function call
    su $username -c "rm -rf /home/$username/endeavouros-i3wm-setup"
-   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
+   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
    systemctl enable lightdm.service
 }   # end of function i3wm
 
@@ -381,10 +385,13 @@ function sway() {
    printf "\n${CYAN}Installing Sway WM ...${NC}\n"
    message="\nInstalling Sway WM  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/sway
+   printf "eos-skel-ce-sway\n" >> sway
    pacman -S --noconfirm --needed - < sway
    ok_nok  # function call
-   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
+   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
    systemctl enable lightdm.service
    cp sway.png /usr/share/endeavouros/backgrounds/
    cp sway.png /home/$username/.config/sway/sway.png
@@ -395,10 +402,13 @@ function bspwm() {
    printf "\n${CYAN}Installing BSPWM ...${NC}\n"
    message="\nInstalling BSPWM  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/bspwm
+   printf "eos-skel-ce-bspwm\n" >> bspwm
    pacman -S --noconfirm --needed - < bspwm
    ok_nok  # function call
-   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
+   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
    systemctl enable lightdm.service
  }  # end of function bspwm
 
