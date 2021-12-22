@@ -809,34 +809,6 @@ mkinitcpio -P  2>> /root/enosARM.log
 printf "\n${CYAN} Updating root user password...\n\n"
 echo "root:${root_user_password}" | chpasswd
 
-# case $dename in
-#   i3wm) pacman -S --noconfirm --needed endeavouros-skel-i3wm ;;
-#  xfce4) pacman -S --noconfirm --needed endeavouros-skel-xfce4 ;;
-#   sway) pacman -S --noconfirm --needed eos-skel-ce-sway ;;
-#  bspwm) pacman -S --noconfirm --needed eos-skel-ce-bspwm ;;
-# esac
-
-#printf "\n${CYAN}Delete default username (alarm) and Creating a user...${NC}"
-#message="Delete default username (alarm) and Creating new user "
-#userdel -r alarm     #delete the default user from the image
-#if [ "$installtype" == "desktop" ]
-#then
-#   useradd -c "$fullname" -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
-#else
-#   useradd -m -G users -s /bin/bash -u 1000 "$username" 2>> /root/enosARM.log
-#fi
-#printf "\n${CYAN} Updating user password...\n\n"
-#echo "${username}:${user_password}" | chpasswd
-
-#if [ "$installtype" == "desktop" ]
-#then
-#   printf "\n${CYAN}Adding user $username to sudo wheel...${NC}"
-#   message="Adding user $username to sudo wheel "
-#   printf "$username  ALL=(ALL:ALL) ALL" >> /etc/sudoers
-#   gpasswd -a $username wheel    # add user to group wheel
-#fi
-
-
 printf "\n${CYAN}Creating ll alias...${NC}"
 message="\nCreating ll alias "
 printf "\nalias ll='ls -l --color=auto'\n" >> /etc/bash.bashrc
@@ -852,6 +824,7 @@ if [ "$installtype" == "desktop" ]
 then
    mkdir -p /usr/share/endeavouros/backgrounds
    cp lightdmbackground.png /usr/share/endeavouros/backgrounds/
+   cp Acalltoarms.png /usr/share/endeavouros/
    if [ $dename != "none" ]     
    then
       $dename      # run appropriate function for installing Desktop Environment
