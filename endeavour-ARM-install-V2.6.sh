@@ -261,6 +261,7 @@ function create-base-addons() {
    then
       printf "sudo\n" >> base-addons
    fi
+   printf "binutils\ngcc\nmake\n" >> base-addons
 }    # end of function create-base-addons
 
 
