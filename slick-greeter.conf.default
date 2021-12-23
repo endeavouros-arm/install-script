@@ -3,9 +3,9 @@
 # indicators = ~~EndeavourOS;~spacer;~clock;~spacer;~language;~session;~A11Y;~power
 draw-grid = false
 draw-user-backgrounds = false
-theme-name = Arc-Dark
+# theme-name = Arc-Dark
 # font-name = Noto Sans 10
 # position = 83%,center 8%,start
-icon-theme-name = capitaine-cursors
+# icon-theme-name = capitaine-cursors
 background = /usr/share/endeavouros/backgrounds/lightdmbackground.png
 logo = /usr/share/endeavouros/Acalltoarms.png

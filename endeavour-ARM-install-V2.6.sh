@@ -386,14 +386,15 @@ function sway() {
    printf "\n${CYAN}Installing Sway WM ...${NC}\n"
    message="\nInstalling Sway WM  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/sway
-   printf "eos-skel-ce-sway\n" >> sway
+   printf "eos-skel-ce-sway\nsddm\n" >> sway
    pacman -S --noconfirm --needed - < sway
    ok_nok  # function call
-   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
-   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
-   systemctl enable lightdm.service
+#   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+#   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+#   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+# sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+#   systemctl enable lightdm.service
+   systemctl enable sddm
    cp sway.png /usr/share/endeavouros/backgrounds/
    cp sway.png /home/$username/.config/sway/sway.png
 }  # end of function sway
