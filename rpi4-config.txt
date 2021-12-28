@@ -1,0 +1,18 @@
+# See /boot/overlays/README for all available options
+
+dtoverlay=vc4-fkms-v3d
+dtparam=i2c_arm=on
+dtparam=spi=on
+dtparam=audio=on
+dtoverlay=w1-gpio
+camera_auto_detect=1
+display_auto_detect=1
+initramfs initramfs-linux.img followkernel
+disable_overscan=1
+gpu_mem=512
+max_framebuffers=2
+
+[pi4]
+# Run as fast as firmware / board allows
+arm_boost=1
+

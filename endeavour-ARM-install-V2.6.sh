@@ -121,6 +121,12 @@ then
    printf "$username  ALL=(ALL:ALL) ALL" >> /etc/sudoers
    gpasswd -a $username wheel    # add user to group wheel
 fi
+
+FILE=/etc/lightdm/lightdm.conf
+if [ -f $FILE ]; then
+    gpasswd -a $username lightdm
+fi
+
 }   # End of function changeuseralarm
 
 
@@ -268,12 +274,13 @@ function create-base-addons() {
 function devicemodel() {
 case $devicemodel in
    "Raspberry Pi") cp /boot/config.txt /boot/config.txt.orig
+                   cp rpi4-config.txt /boot/config.txt
                    #printf "dtparam=audio=on\n" >> /boot/config.txt
                    #printf "# hdmi_group=1\n# hdmi_mode=4\n" >> /boot/config.txt
                    #printf "disable_overscan=1\n" >> /boot/config.txt
-                   printf "#over_voltage=5\n# arm_freq=2000\n# gpu_freq=750\n" >> /boot/config.txt
+                   #printf "#over_voltage=5\n# arm_freq=2000\n# gpu_freq=750\n" >> /boot/config.txt
                    #printf "max_framebuffers=2\ngpu-mem=320\n" >> /boot/config.txt
-                   cp /boot/config.txt /boot/config.txt.bkup
+
                    pacman -S --noconfirm --needed wireless-regdb crda
                    sed -i 's/#WIRELESS_REGDOM="US"/WIRELESS_REGDOM="US"/g' /etc/conf.d/wireless-regdom ;;
    "ODROID-N2")    cp /root/install-script/n2-boot.ini /boot/boot.ini
@@ -293,7 +300,7 @@ function xfce4() {
    printf "\n${CYAN}Installing XFCE4 ...${NC}\n"
    message="\nInstalling XFCE4  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/xfce4
-   printf "endeavouros-skel-xfce4\n" >> xfce4
+#   printf "endeavouros-skel-xfce4\n" >> xfce4
    pacman -S --noconfirm --needed - < xfce4
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
@@ -375,7 +382,7 @@ function i3wm() {
    pacman -S --noconfirm --needed - < i3
    ok_nok  # function call
    su $username -c "rm -rf /home/$username/endeavouros-i3wm-setup"
-   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
@@ -386,15 +393,14 @@ function sway() {
    printf "\n${CYAN}Installing Sway WM ...${NC}\n"
    message="\nInstalling Sway WM  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/sway
-   printf "eos-skel-ce-sway\nsddm\n" >> sway
+#   printf "eos-skel-ce-sway\nsddm\n" >> sway
    pacman -S --noconfirm --needed - < sway
    ok_nok  # function call
-#   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
-#   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-#   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-# sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
-#   systemctl enable lightdm.service
-   systemctl enable sddm
+   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+   systemctl enable lightdm.service
    cp sway.png /usr/share/endeavouros/backgrounds/
    cp sway.png /home/$username/.config/sway/sway.png
 }  # end of function sway
@@ -404,7 +410,7 @@ function bspwm() {
    printf "\n${CYAN}Installing BSPWM ...${NC}\n"
    message="\nInstalling BSPWM  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/bspwm
-   printf "eos-skel-ce-bspwm\n" >> bspwm
+#   printf "eos-skel-ce-bspwm\n" >> bspwm
    pacman -S --noconfirm --needed - < bspwm
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
@@ -413,6 +419,36 @@ function bspwm() {
    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
    systemctl enable lightdm.service
  }  # end of function bspwm
+
+  function qtile() {
+   printf "\n${CYAN}Installing Qtile ...${NC}\n"
+   message="\nInstalling Qtile  "
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/qtile
+   pacman -S --noconfirm --needed - < qtile
+   ok_nok  # function call
+   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+#   sed -i 's/#logind-check-graphical=false/logind-check-graphical=true/g' /etc/lightdm/lightdm.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+#   sed -i 's/#allow-user-switching=true/allow-user-switching=true/g' /etc/lightdm/lightdm.conf
+   systemctl enable lightdm.service
+ }   # end of function qtile
+
+ function openbox() {
+   printf "\n${CYAN}Installing Openbox ...${NC}\n"
+   message="\nInstalling Openbox  "
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/openbox
+   pacman -S --noconfirm --needed - < openbox
+   ok_nok  # function call
+   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+#   sed -i 's/#logind-check-graphical=false/logind-check-graphical=true/g' /etc/lightdm/lightdm.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+#   sed -i 's/#allow-user-switching=true/allow-user-switching=true/g' /etc/lightdm/lightdm.conf
+   systemctl enable lightdm.service
+ } # end of function openbox
 
 ####################################
 
@@ -619,34 +655,72 @@ do
 
 #################################################################################################
 
+#   if [ "$installtype" == "desktop" ]
+#   then
+#   dename=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Desktop Selection" --menu --notags "Choose which Desktop Environment to install" 17 100 11 \
+#            "0" "No Desktop Environment" \
+#            "1" "XFCE4" \
+#            "2" "Mate" \
+#            "3" "KDE Plasma" \
+#            "4" "Gnome" \
+#            "5" "Cinnamon" \
+#            "6" "Budgie-Desktop" \
+#            "7" "LXQT" \
+#            "8" "i3 wm    for x11" \
+#            "9" "Sway wm  for wayland" \
+#           "10" "BSPWM" \
+#          3>&2 2>&1 1>&3)
+#
+#      case $dename in
+#         0) dename="none" ;;
+#         1) dename="xfce4" ;;
+#         2) dename="mate" ;;
+#         3) dename="kde" ;;
+#         4) dename="gnome" ;;
+#         5) dename="cinnamon" ;;
+#        6) dename="budgie" ;;
+#         7) dename="lxqt" ;;
+#        8) dename="i3wm" ;;
+#        9) dename="sway" ;;
+#        10) dename="bspwm" ;;
+#      esac
+#   fi
+
    if [ "$installtype" == "desktop" ]
    then
-   dename=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Desktop Selection" --menu --notags "Choose which Desktop Environment to install" 17 100 11 \
+
+   dename=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Desktop Selection" --menu --notags "\n                          Choose which Desktop Environment to install\n\n" 22 100 14 \
             "0" "No Desktop Environment" \
             "1" "XFCE4" \
-            "2" "Mate" \
-            "3" "KDE Plasma" \
-            "4" "Gnome" \
-            "5" "Cinnamon" \
-            "6" "Budgie-Desktop" \
-            "7" "LXQT" \
-            "8" "i3 wm    for x11" \
-            "9" "Sway wm  for wayland" \
+            "2" "KDE Plasma" \
+            "3" "Gnome" \
+            "4" "i3 wm    for x11" \
+            "5" "Mate" \
+            "6" "Cinnamon" \
+            "7" "Budie" \
+            "8" "LXQT" \
+            "9" "LXDE" \
             "10" "BSPWM" \
+            "11" "Openbox" \
+            "12" "Qtile" \
+            "13" "Sway    for Wayland" \
           3>&2 2>&1 1>&3)
 
       case $dename in
          0) dename="none" ;;
          1) dename="xfce4" ;;
-         2) dename="mate" ;;
-         3) dename="kde" ;;
-         4) dename="gnome" ;;
-         5) dename="cinnamon" ;;
-         6) dename="budgie" ;;
-         7) dename="lxqt" ;;
-         8) dename="i3wm" ;;
-         9) dename="sway" ;;
+         2) dename="kde" ;;
+         3) dename="gnome" ;;
+         4) dename="13wm" ;;
+         5) dename="mate" ;;
+         6) dename="cinnamon" ;;
+         7) dename="budgie" ;;
+         8) dename="lxqt" ;;
+         9) dename="lxde" ;;
         10) dename="bspwm" ;;
+        11) dename="openbox" ;;
+        12) dename="qtile" ;;
+        13) dename="sway" ;;
       esac
    fi
 
@@ -737,6 +811,8 @@ devicemodel=$(dmesg | grep "Machine model" | sed -e '/Raspberry Pi/ c Raspberry 
 
 findmirrorlist   # find and install EndeavourOS mirrorlist
 findkeyring      # find and install EndeavourOS keyring
+printf "\nTime to edit\n"
+read -n 1 z
 pacman -Syy
 
 ### the following installs all packages needed to match the EndeavourOS base install
