@@ -655,36 +655,6 @@ do
 
 #################################################################################################
 
-#   if [ "$installtype" == "desktop" ]
-#   then
-#   dename=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Desktop Selection" --menu --notags "Choose which Desktop Environment to install" 17 100 11 \
-#            "0" "No Desktop Environment" \
-#            "1" "XFCE4" \
-#            "2" "Mate" \
-#            "3" "KDE Plasma" \
-#            "4" "Gnome" \
-#            "5" "Cinnamon" \
-#            "6" "Budgie-Desktop" \
-#            "7" "LXQT" \
-#            "8" "i3 wm    for x11" \
-#            "9" "Sway wm  for wayland" \
-#           "10" "BSPWM" \
-#          3>&2 2>&1 1>&3)
-#
-#      case $dename in
-#         0) dename="none" ;;
-#         1) dename="xfce4" ;;
-#         2) dename="mate" ;;
-#         3) dename="kde" ;;
-#         4) dename="gnome" ;;
-#         5) dename="cinnamon" ;;
-#        6) dename="budgie" ;;
-#         7) dename="lxqt" ;;
-#        8) dename="i3wm" ;;
-#        9) dename="sway" ;;
-#        10) dename="bspwm" ;;
-#      esac
-#   fi
 
    if [ "$installtype" == "desktop" ]
    then
@@ -811,8 +781,6 @@ devicemodel=$(dmesg | grep "Machine model" | sed -e '/Raspberry Pi/ c Raspberry 
 
 findmirrorlist   # find and install EndeavourOS mirrorlist
 findkeyring      # find and install EndeavourOS keyring
-printf "\nTime to edit\n"
-read -n 1 z
 pacman -Syy
 
 ### the following installs all packages needed to match the EndeavourOS base install
