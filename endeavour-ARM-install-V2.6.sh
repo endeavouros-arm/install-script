@@ -362,6 +362,19 @@ function budgie() {
   systemctl enable lightdm.service
 }  # end of function budgie
 
+function lxde() {
+   printf "\n${CYAN}Installing LXDE...${NC}\n"
+   message="\nInstalling LXDE  "
+   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/lxde
+   pacman -S --noconfirm --needed - < lxde
+   ok_nok  # function call
+   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
+   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+   systemctl enable lightdm.service
+}  # end of function lxde
+
 function lxqt() {
    printf "\n${CYAN}Installing LXQT...${NC}\n"
    message="\nInstalling LXQT  "
@@ -381,7 +394,6 @@ function i3wm() {
    printf "endeavouros-skel-i3wm\nlightdm-gtk-greeter\nlightdm-gtk-greeter-settings\n" >> i3
    pacman -S --noconfirm --needed - < i3
    ok_nok  # function call
-#   su $username -c "rm -rf /home/$username/endeavouros-i3wm-setup"
    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
@@ -449,6 +461,7 @@ function bspwm() {
 #   sed -i 's/#allow-user-switching=true/allow-user-switching=true/g' /etc/lightdm/lightdm.conf
    systemctl enable lightdm.service
  } # end of function openbox
+
 
 ####################################
 
