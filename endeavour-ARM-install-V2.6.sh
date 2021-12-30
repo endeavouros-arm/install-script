@@ -378,10 +378,10 @@ function i3wm() {
    printf "\n${CYAN}Installing i3-wm ...${NC}\n"
    message="\nInstalling i3-wm  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/i3
-   printf "endeavouros-skel-i3wm\n" >> i3
+   printf "endeavouros-skel-i3wm\nlightdm-gtk-greeter\nlightdm-gtk-greeter-settings\n" >> i3
    pacman -S --noconfirm --needed - < i3
    ok_nok  # function call
-   su $username -c "rm -rf /home/$username/endeavouros-i3wm-setup"
+#   su $username -c "rm -rf /home/$username/endeavouros-i3wm-setup"
    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
@@ -393,14 +393,14 @@ function sway() {
    printf "\n${CYAN}Installing Sway WM ...${NC}\n"
    message="\nInstalling Sway WM  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/sway
-#   printf "eos-skel-ce-sway\nsddm\n" >> sway
+   printf "sddm\n" >> sway
    pacman -S --noconfirm --needed - < sway
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
-   systemctl enable lightdm.service
+   systemctl enable sddm.service
    cp sway.png /usr/share/endeavouros/backgrounds/
    cp sway.png /home/$username/.config/sway/sway.png
 }  # end of function sway
@@ -416,7 +416,7 @@ function bspwm() {
    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a #  greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
    systemctl enable lightdm.service
  }  # end of function bspwm
 
@@ -667,7 +667,7 @@ do
             "4" "i3 wm    for x11" \
             "5" "Mate" \
             "6" "Cinnamon" \
-            "7" "Budie" \
+            "7" "Budgie" \
             "8" "LXQT" \
             "9" "LXDE" \
             "10" "BSPWM" \
