@@ -681,7 +681,7 @@ do
          1) dename="xfce4" ;;
          2) dename="kde" ;;
          3) dename="gnome" ;;
-         4) dename="13wm" ;;
+         4) dename="i3wm" ;;
          5) dename="mate" ;;
          6) dename="cinnamon" ;;
          7) dename="budgie" ;;
