@@ -12,6 +12,9 @@ disable_overscan=1
 gpu_mem=512
 max_framebuffers=2
 
+#Uncomment - to - endable - bluetooth
+#dtparam=krnbt=on
+
 [pi4]
 # Run as fast as firmware / board allows
 arm_boost=1
