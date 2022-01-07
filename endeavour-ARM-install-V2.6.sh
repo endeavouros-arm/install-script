@@ -795,6 +795,9 @@ devicemodel=$(dmesg | grep "Machine model" | sed -e '/Raspberry Pi/ c Raspberry 
 findmirrorlist   # find and install EndeavourOS mirrorlist
 findkeyring      # find and install EndeavourOS keyring
 pacman -Syy
+pacman -S --noconfirm --needed eos-rankmirrors
+sed -i 's/EOS_AUTO_MIRROR_RANKING=no/EOS_AUTO_MIRROR_RANKING=yes/g' /etc/eos-rankmirrors.conf
+eos-rankmirrors
 
 ### the following installs all packages needed to match the EndeavourOS base install
 printf "\n${CYAN}Installing EndeavourOS Base Addons...${NC}\n"
