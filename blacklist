@@ -9,7 +9,6 @@ efibootmgr
 efitools
 endeavouros-keyring
 endeavouros-mirrorlist
-eos-rankmirrors
 git
 grub
 grub2-theme-endeavouros

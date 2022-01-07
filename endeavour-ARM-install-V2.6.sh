@@ -303,8 +303,10 @@ function xfce4() {
 #   printf "endeavouros-skel-xfce4\n" >> xfce4
    pacman -S --noconfirm --needed - < xfce4
    ok_nok  # function call
-   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
+   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
    systemctl enable lightdm.service
 }   # end of function xfce4
 
@@ -314,8 +316,10 @@ function mate() {
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/mate
    pacman -S --noconfirm --needed - < mate
    ok_nok  # function call
-   cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
+   cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+   cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
    systemctl enable lightdm.service
 }   # end of function mate
 
@@ -346,8 +350,10 @@ function cinnamon() {
   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/cinnamon
   pacman -S --noconfirm --needed - < cinnamon
   ok_nok  # function call
-  cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
+  cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+  cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+  sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
   systemctl enable lightdm.service
 }   # end of function cinnamon
 
@@ -357,8 +363,10 @@ function budgie() {
   wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/budgie
   pacman -S --noconfirm --needed - < budgie
   ok_nok  # function call
-  cp lightdm-gtk-greeter.conf.default   /etc/lightdm/
+  cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
   cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+  cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+  sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
   systemctl enable lightdm.service
 }  # end of function budgie
 
@@ -795,9 +803,6 @@ devicemodel=$(dmesg | grep "Machine model" | sed -e '/Raspberry Pi/ c Raspberry 
 findmirrorlist   # find and install EndeavourOS mirrorlist
 findkeyring      # find and install EndeavourOS keyring
 pacman -Syy
-pacman -S --noconfirm --needed eos-rankmirrors
-sed -i 's/EOS_AUTO_MIRROR_RANKING=no/EOS_AUTO_MIRROR_RANKING=yes/g' /etc/eos-rankmirrors.conf
-eos-rankmirrors
 
 ### the following installs all packages needed to match the EndeavourOS base install
 printf "\n${CYAN}Installing EndeavourOS Base Addons...${NC}\n"
@@ -816,6 +821,8 @@ else
 fi
 ok_nok   # function call
 
+sed -i 's/EOS_AUTO_MIRROR_RANKING=no/EOS_AUTO_MIRROR_RANKING=yes/g' /etc/eos-rankmirrors.conf
+eos-rankmirrors
 
 printf "\n${CYAN}Setting Time Zone...${NC}\n"
 message="\nSetting Time Zone  "
