@@ -444,13 +444,14 @@ function bspwm() {
    printf "\n${CYAN}Installing Qtile ...${NC}\n"
    message="\nInstalling Qtile  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/qtile
+   printf "lightdm-gtk-greeter\n" >> qtile
    pacman -S --noconfirm --needed - < qtile
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
 #   sed -i 's/#logind-check-graphical=false/logind-check-graphical=true/g' /etc/lightdm/lightdm.conf
-   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
 #   sed -i 's/#allow-user-switching=true/allow-user-switching=true/g' /etc/lightdm/lightdm.conf
    systemctl enable lightdm.service
  }   # end of function qtile
