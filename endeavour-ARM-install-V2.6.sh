@@ -430,13 +430,13 @@ function bspwm() {
    printf "\n${CYAN}Installing BSPWM ...${NC}\n"
    message="\nInstalling BSPWM  "
    wget -q https://github.com/endeavouros-team/EndeavourOS-packages-lists/raw/master/bspwm
-#   printf "eos-skel-ce-bspwm\n" >> bspwm
+   printf "lightdm-gtk-greeter\n" >> bspwm
    pacman -S --noconfirm --needed - < bspwm
    ok_nok  # function call
    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-   sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+   sed -i '/#greeter-session=example-gtk-gnome/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
    systemctl enable lightdm.service
  }  # end of function bspwm
 
@@ -906,11 +906,11 @@ then
    fi
    changeuseralarm    # remove user alarm and create new user of choice
    devicemodel  # Perform device specific chores
-   FILENAME="/etc/lightdm/lightdm.conf"
-   if [ -f $FILENAME ]
-   then
-      sed -i 's/#logind-check-graphical=false/logind-check-graphical=true/g' $FILENAME
-   fi  
+#   FILENAME="/etc/lightdm/lightdm.conf"
+#   if [ -f $FILENAME ]
+#   then
+#      sed -i 's/#logind-check-graphical=false/logind-check-graphical=true/g' $FILENAME
+#   fi
 fi
 
 ########################### end of desktop setup ##############################
