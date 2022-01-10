@@ -274,7 +274,15 @@ function create-base-addons() {
 function devicemodel() {
 case $devicemodel in
    "Raspberry Pi") cp /boot/config.txt /boot/config.txt.orig
-                   cp rpi4-config.txt /boot/config.txt
+                   Bstr=$(uname -r)
+                   if [[ "$Bstr" == *"aarch64"* ]]; then
+                      printf "dtoverlay=vc4-kms-v3d\ninitramfs initramfs-linux.img followkernel\n" >> /boot/config.txt
+                      printf "disable_overscan=1\ngpu_mem=512\nmax_framebuffers=2\n" >> /boot/config.txt
+                      printf "[pi4]\n# Run as fast as firmware / board allows\narm_boost=1\n" >> /boot/config.txt
+                   else
+                      cp rpi4-config.txt /boot/config.txt
+                   fi
+#                  cp rpi4-config.txt /boot/config.txt
                    #printf "dtparam=audio=on\n" >> /boot/config.txt
                    #printf "# hdmi_group=1\n# hdmi_mode=4\n" >> /boot/config.txt
                    #printf "disable_overscan=1\n" >> /boot/config.txt
