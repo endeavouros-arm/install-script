@@ -17,7 +17,6 @@ hwinfo
 intel-ucode
 ipw2100-fw
 ipw2200-fw
-keyserver-rank
 linux
 linux-firmware
 linux-headers
@@ -29,11 +28,9 @@ mdadm
 mkinitcpio-openswap
 nilfs-utils
 os-prober
-r8168
 reflector
 reflector-simple
 sg3_utils
-tlp
 upower
 xf86-video-ati
 xf86-video-intel
