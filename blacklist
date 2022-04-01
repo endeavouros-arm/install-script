@@ -2,6 +2,8 @@ amd-ucode
 base
 base-devel
 broadcom-wl-dkms
+crda
+dialog
 dmraid
 dnsutils
 downgrade
@@ -9,6 +11,8 @@ efibootmgr
 efitools
 endeavouros-keyring
 endeavouros-mirrorlist
+eos-packagelist
+findutils
 git
 grub
 grub2-theme-endeavouros
@@ -28,9 +32,16 @@ mdadm
 mkinitcpio-openswap
 nilfs-utils
 os-prober
+pcurses
 reflector
 reflector-simple
+sed
 sg3_utils
 upower
+vi
+wget
+wireless-regdb
+wpa_supplicant
 xf86-video-ati
 xf86-video-intel
+xz
