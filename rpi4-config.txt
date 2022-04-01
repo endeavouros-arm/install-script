@@ -1,11 +1,6 @@
 # See /boot/overlays/README for all available options
 
-dtoverlay=vc4-fkms-v3d
-dtparam=i2c_arm=on
-dtparam=spi=on
-dtparam=audio=on
-dtoverlay=w1-gpio
-camera_auto_detect=1
+dtoverlay=vc4-kms-v3d
 display_auto_detect=1
 initramfs initramfs-linux.img followkernel
 disable_overscan=1
