@@ -32,7 +32,6 @@ mdadm
 mkinitcpio-openswap
 nilfs-utils
 os-prober
-pcurses
 reflector
 reflector-simple
 sed
