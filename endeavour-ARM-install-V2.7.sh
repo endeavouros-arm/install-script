@@ -205,12 +205,7 @@ _change_user_alarm() {
 }   # End of function _change_user_alarm
 
 _clean_up() {
-#    local dhcpcd_installed
 
-#    dhcpcd_installed=$(pacman -Qs dhcpcd)
-#    if [[ "$dhcpcd_installed" != "" ]]; then
-#       pacman -Rn --noconfirm dhcpcd
-#    fi
     # rebranding to EndeavourOS
     sed -i 's/Arch/EndeavourOS/' /etc/issue
     sed -i 's/Arch/EndeavourOS/' /etc/arch-release
@@ -539,7 +534,7 @@ _user_input() {
 
        if [ "$INSTALLTYPE" == "desktop" ]
        then
-          DENAME=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Desktop Selection" --menu --notags "\n                          Choose which Desktop Environment to install\n\n" 22 100 14 \
+          DENAME=$(whiptail --nocancel --title "EndeavourOS ARM Setup - Desktop Selection" --menu --notags "\n                          Choose which Desktop Environment to install\n\n" 22 100 15 \
                "0" "No Desktop Environment" \
                "1" "XFCE4" \
                "2" "KDE Plasma" \
@@ -554,6 +549,7 @@ _user_input() {
               "11" "Openbox" \
               "12" "Qtile" \
               "13" "Sway    for Wayland" \
+              "14" "worm" \
               3>&2 2>&1 1>&3)
 
           case $DENAME in
@@ -571,6 +567,7 @@ _user_input() {
             11) DENAME="openbox" ;;
             12) DENAME="qtile" ;;
             13) DENAME="sway" ;;
+            14) DENAME="worm" ;;
           esac
        fi
 
@@ -826,6 +823,19 @@ _openbox() {
     sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
 } # end of function _openbox
+
+_worm() {
+    printf "\n${CYAN}Installing worm ...${NC}\n"
+    MESSAGE="\nInstalling worm  "
+    eos-packagelist --arch arm "Worm Edition" > worm
+    pacman -S --noconfirm --needed - < worm
+    _ok_nok  # function call
+    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    systemctl enable lightdm.service
+}
 
 _desktop_setup() {
     mkdir -p /usr/share/endeavouros/backgrounds
