@@ -834,8 +834,8 @@ _worm() {
     cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
     cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
     cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
-    sed -i '/#greeter-session=example-gtk-gnome/#greeter-session=lightdm-gtk-greeter' /etc/lightdm/lightdm.conf
+    sed -i '/#greeter-session=example-gtk-gnome/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-gtk-greeter' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
 }
 
