@@ -828,12 +828,15 @@ _worm() {
     printf "\n${CYAN}Installing worm ...${NC}\n"
     MESSAGE="\nInstalling worm  "
     eos-packagelist --arch arm "Worm Edition" > worm
+    printf "lightdm\nlightdm-slick-greeter\nlightdm-gtk-greeter\n"
     pacman -S --noconfirm --needed - < worm
     _ok_nok  # function call
     cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
     cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
     cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/
+    sed -i '/#greeter-session=example-gtk-gnome/#greeter-session=lightdm-gtk-greeter' /etc/lightdm/
+    lightdm.conf
     systemctl enable lightdm.service
 }
 
