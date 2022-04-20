@@ -109,7 +109,7 @@ _base_addons() {
     if [ "$INSTALLTYPE" == "desktop" ]
     then
        eos-packagelist --arch arm "Base-devel + Common packages" "Firefox and language package" > base-addons
-       printf "autoconf\nautomake\nbison\nflex\ngroff\nm4\npkgconf\n"
+       printf "autoconf\nautomake\nbison\nflex\ngroff\nm4\npkgconf\n" >> base-addons
        pacman -S --noconfirm --needed - < base-addons
 #       systemctl disable dhcpcd.service
 #       systemctl enable NetworkManager.service
