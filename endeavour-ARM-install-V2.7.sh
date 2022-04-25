@@ -108,7 +108,7 @@ _base_addons() {
     sleep 2
     if [ "$INSTALLTYPE" == "desktop" ]
     then
-       eos-packagelist --arch arm "Base-devel + Common packages" "Firefox and language package" > base-addons
+       eos-packagelist --arch arm "Systembase + Common packages" "Firefox and language package" > base-addons
        printf "autoconf\nautomake\nbison\nflex\ngroff\nm4\npkgconf\nmake\ngcc\npatch\n" >> base-addons
        pacman -S --noconfirm --needed - < base-addons
 #       systemctl disable dhcpcd.service
