@@ -54,7 +54,7 @@ _find_mirrorlist() {
     printf "\n${CYAN}Find current endeavouros-mirrorlist...${NC}\n\n"
     MESSAGE="\nFind current endeavouros-mirrorlist "
     sleep 1
-    curl https://github.com/endeavouros-team/repo/tree/master/endeavouros/$ARMARCH | grep "endeavouros-mirrorlist" |sed s'/^.*endeavouros-mirrorlist/endeavouros-mirrorlist/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g |tail -1 > mirrors
+    curl https://github.com/endeavouros-team/repo/tree/master/endeavouros/$ARMARCH | grep "endeavouros-mirrorlist" | sed s'/^.*endeavouros-mirrorlist/endeavouros-mirrorlist/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g |tail -1 > mirrors
 
     tmpfile="mirrors"
     read -d $'\x04' currentmirrorlist < "$tmpfile"
@@ -82,7 +82,7 @@ _find_keyring() {
     printf "\n${CYAN}Find current endeavouros-keyring...${NC}\n\n"
     MESSAGE="\nFind current endeavouros-keyring "
     sleep 1
-    curl https://github.com/endeavouros-team/repo/tree/master/endeavouros/$ARMARCH |grep endeavouros-keyring |sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g | tail -1 > keys
+    curl https://github.com/endeavouros-team/repo/tree/master/endeavouros/$ARMARCH |grep endeavouros-keyring | sed s'/^.*endeavouros-keyring/endeavouros-keyring/'g | sed s'/pkg.tar.zst.*/pkg.tar.zst/'g | tail -1 > keys
 
     tmpfile="keys"
     read -d $'\04' currentkeyring < "$tmpfile"
