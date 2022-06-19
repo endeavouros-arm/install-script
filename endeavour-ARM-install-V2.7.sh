@@ -109,7 +109,8 @@ _base_addons() {
     if [ "$INSTALLTYPE" == "desktop" ]
     then
        eos-packagelist --arch arm "Desktop-Base + Common packages" "Firefox and language package" > base-addons
-       printf "autoconf\nautomake\nbison\nflex\ngroff\nm4\npkgconf\nmake\ngcc\npatch\n" >> base-addons
+       printf "base-devel\nbtrfs-progs\npipewire-media-session" >> base-addons
+       sed -i "/wireplumber/d" base-addons
        pacman -S --noconfirm --needed - < base-addons
 #       systemctl disable dhcpcd.service
 #       systemctl enable NetworkManager.service
@@ -654,10 +655,10 @@ _xfce4() {
     eos-packagelist --arch arm "XFCE4-Desktop" > xfce4
     pacman -S --noconfirm --needed - < xfce4
     _ok_nok  # function call
-    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
-    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    # cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
+    # cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+    # cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+    # sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
 }   # end of function _xfce4
 
@@ -667,10 +668,10 @@ _mate() {
     eos-packagelist --arch arm "MATE-Desktop" > mate
     pacman -S --noconfirm --needed - < mate
     _ok_nok  # function call
-    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
-    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    # cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
+    # cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+    # cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+    # sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
 }   # end of function _mate
 
@@ -678,6 +679,7 @@ _kde() {
     printf "\n${CYAN}Installing KDE Plasma...${NC}\n"
     MESSAGE="\nInstalling KDE Plasma  "
     eos-packagelist --arch arm "KDE-Desktop" > plasma
+    printf "plasma-wayland-session\n" >> plasma
     pacman -S --noconfirm --needed - < plasma
     _ok_nok  # function call
     systemctl enable sddm.service
@@ -698,10 +700,10 @@ _cinnamon() {
     eos-packagelist --arch arm "Cinnamon-Desktop" > cinnamon
     pacman -S --noconfirm --needed - < cinnamon
     _ok_nok  # function call
-    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
-    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    # cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
+    # cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+    # cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+    # sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
 }   # end of function _cinnamon
 
@@ -711,14 +713,14 @@ _budgie() {
     eos-packagelist --arch arm "Budgie-Desktop" > budgie
 #    printf "gdm\n" >> budgie
 #    sed -i '/lightdm/d' budgie
-    printf "lightdm-gtk-greeter\nlightdm-gtk-greeter-settings\n" >> budgie
+    # printf "lightdm-gtk-greeter\nlightdm-gtk-greeter-settings\n" >> budgie
     pacman -S --noconfirm --needed - < budgie
     _ok_nok  # function call
-    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
-    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-gtk-greeter/g' /etc/lightdm/lightdm.conf
-    sed -i '/greeter-session=lightdm-gtk-greeter/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    # cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+    # cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+    # cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+    # sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-gtk-greeter/g' /etc/lightdm/lightdm.conf
+    # sed -i '/greeter-session=lightdm-gtk-greeter/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
 #    systemctl enable gdm.service
 }  # end of function _budgie
@@ -727,14 +729,14 @@ _lxde() {
     printf "\n${CYAN}Installing LXDE...${NC}\n"
     MESSAGE="\nInstalling LXDE  "
     eos-packagelist --arch arm "LXDE-Desktop" > lxde
-    printf "lightdm\nlightdm-slick-greeter\n" >> lxde
-    sed -i '/eos-lxdm-gtk3/d' lxde
+    # printf "lightdm\nlightdm-slick-greeter\n" >> lxde
+    # sed -i '/eos-lxdm-gtk3/d' lxde
     pacman -S --noconfirm --needed - < lxde
     _ok_nok  # function call
-    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
-    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    # cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default /etc/lightdm/
+    # cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+    # cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+    # sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
 #     systemctl enable eos-lxdm-gtk3.service
 }  # end of function _lxde
@@ -786,14 +788,16 @@ _bspwm() {
     printf "\n${CYAN}Installing BSPWM ...${NC}\n"
     MESSAGE="\nInstalling BSPWM  "
     eos-packagelist --arch arm "BSPWM Edition" > bspwm
-    printf "lightdm-gtk-greeter\nlightdm-gtk-greeter-settings\n" >> bspwm
+    printf "lightdm-gtk-greeter\neos-lightdm-gtk-theme\n" >> bspwm
+    sed -i '/lightdm-slick-greeter/d' bspwm
+    sed -i '/eos-lightdm-slick-theme/d' bspwm
     pacman -S --noconfirm --needed - < bspwm
     _ok_nok  # function call
-    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
-    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-gtk-greeter/g' /etc/lightdm/lightdm.conf
-    sed -i '/greeter-session=lightdm-gtk-greeter/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    # cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+    # cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+    # cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+    # sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-gtk-greeter/g' /etc/lightdm/lightdm.conf
+    # sed -i '/greeter-session=lightdm-gtk-greeter/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
  }  # end of function _bspwm
 
@@ -801,14 +805,16 @@ _qtile() {
     printf "\n${CYAN}Installing Qtile ...${NC}\n"
     MESSAGE="\nInstalling Qtile  "
     eos-packagelist --arch arm "Qtile Edition" > qtile
-    printf "lightdm-gtk-greeter\nlightdm-gtk-greeter-settings\n" >> qtile
+    printf "lightdm-gtk-greeter\neos-lightdm-gtk-theme\n" >> bspwm
+    sed -i '/lightdm-slick-greeter/d' bspwm
+    sed -i '/eos-lightdm-slick-theme/d' bspwm
     pacman -S --noconfirm --needed - < qtile
     _ok_nok  # function call
-    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
-    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-gtk-greeter/g' /etc/lightdm/lightdm.conf
-    sed -i '/greeter-session=lightdm-gtk-greeter/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    # cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+    # cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+    # cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+    # sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-gtk-greeter/g' /etc/lightdm/lightdm.conf
+    # sed -i '/greeter-session=lightdm-gtk-greeter/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
 }   # end of function _qtile
 
@@ -818,10 +824,10 @@ _openbox() {
     eos-packagelist --arch arm "Openbox Edition" > openbox
     pacman -S --noconfirm --needed - < openbox
     _ok_nok  # function call
-    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
-    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    # cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+    # cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+    # cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+    # sed -i '/#greeter-session=example-gtk-gnome/a greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
 } # end of function _openbox
 
@@ -829,21 +835,24 @@ _worm() {
     printf "\n${CYAN}Installing worm ...${NC}\n"
     MESSAGE="\nInstalling worm  "
     eos-packagelist --arch arm "Worm Edition" > worm
-    printf "lightdm\nlightdm-slick-greeter\nlightdm-gtk-greeter\n" >> worm
+    printf "lightdm-gtk-greeter\neos-lightdm-gtk-theme\n" >> bspwm
+    sed -i '/lightdm-slick-greeter/d' bspwm
+    sed -i '/eos-lightdm-slick-theme/d' bspwm
     pacman -S --noconfirm --needed - < worm
     _ok_nok  # function call
-    cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
-    cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
-    cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
-    sed -i '/#greeter-session=example-gtk-gnome/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
-    sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
+    # cp lightdm-gtk-greeter.conf.default slick-greeter.conf.default  /etc/lightdm/
+    # cp /etc/lightdm/lightdm-gtk-greeter.conf.default /etc/lightdm/lightdm-gtk-greeter.conf
+    # cp /etc/lightdm/slick-greeter.conf.default /etc/lightdm/slick-greeter.conf
+    # sed -i '/#greeter-session=example-gtk-gnome/a #greeter-session=lightdm-slick-greeter' /etc/lightdm/lightdm.conf
+    # sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
     systemctl enable lightdm.service
 }
 
 _desktop_setup() {
     mkdir -p /usr/share/endeavouros/backgrounds
-    cp lightdmbackground.png /usr/share/endeavouros/backgrounds/
+    # cp lightdmbackground.png /usr/share/endeavouros/backgrounds/
     cp Acalltoarms.png /usr/share/endeavouros/
+    cp ORION-sky-ARM.png /usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png
     if [ $DENAME != "_none" ]
     then
        $DENAME      # run appropriate function for installing Desktop Environment
